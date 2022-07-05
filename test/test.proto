@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package dart_test;
+
+message TestMessage {
+    optional string name = 1;
+    int32 code = 2;
+    int64 longCode=3;
+
+    TestStruct msg = 4;
+    TestMessage msg1 = 5;
+}
+
+message TestStruct{
+    string a =1;
+    string b=2;
+    bytes c =3;
+}
