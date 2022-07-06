@@ -232,6 +232,7 @@ class IsarGenerator extends ProtobufContainer {
 
       generateFields(out);
     });
+
     out.println();
   }
 
@@ -279,19 +280,18 @@ class IsarGenerator extends ProtobufContainer {
       out.println(') {');
       out.println('  final result = $classname();');
       for (final field in _fieldList) {
-        out.println('  if (proto.${field.memberNames!.fieldName} != null) {');
         if (field.isRepeated || field.isMapField) {
           out.println(
-              '    result.${field.memberNames!.fieldName}.addAll(proto.${field.memberNames!.fieldName});');
+              '  result.${field.memberNames!.fieldName}.addAll(proto.${field.memberNames!.fieldName} as ${field.getDartType()});');
         } else if (field.baseType.descriptor ==
-            FieldDescriptorProto_Type.TYPE_MESSAGE) {
+                FieldDescriptorProto_Type.TYPE_MESSAGE ||
+            field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_ENUM) {
           out.println(
-              '    result.${field.memberNames!.fieldName} = ${field.getDartType()}.fromProto(${field.memberNames!.fieldName});');
+              '  result.${field.memberNames!.fieldName} = ${field.getDartType()}.fromProto(proto.${field.memberNames!.fieldName});');
         } else {
           out.println(
-              '    result.${field.memberNames!.fieldName} = proto.${field.memberNames!.fieldName};');
+              '  result.${field.memberNames!.fieldName} = proto.${field.memberNames!.fieldName};');
         }
-        out.println('  }');
       }
       out.println('  return result;');
       out.println('}');

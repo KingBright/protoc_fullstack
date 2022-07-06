@@ -113,7 +113,7 @@ class ProtobufField {
   /// `map<key_type, value_type> map_field = N`.
   bool get isMapField {
     if (!isRepeated || !baseType.isMessage) return false;
-    final generator = baseType.generator as MessageGenerator;
+    final generator = baseType.generator as IsarGenerator;
     return generator._descriptor.options.hasMapEntry();
   }
 
@@ -143,7 +143,7 @@ class ProtobufField {
       final d = baseType.generator as MessageGenerator;
       var keyType = d._fieldList[0].baseType.getDartType(parent.fileGen!);
       var valueType = d._fieldList[1].baseType.getDartType(parent.fileGen!);
-      return '$coreImportPrefix.Map<$keyType, $valueType>';
+      return 'Map<$keyType, $valueType>';
     }
     if (isRepeated) return baseType.getRepeatedDartType(parent.fileGen!);
     return baseType.getDartType(parent.fileGen!);

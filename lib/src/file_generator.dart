@@ -181,15 +181,9 @@ class FileGenerator extends ProtobufContainer {
       if (options.generateIsar) {
         isarGenerators.add(IsarGenerator.topLevel(descriptor.messageType[i],
             this, declaredMixins, defaultMixin, usedTopLevelNames, i));
-      } else {
-        messageGenerators.add(MessageGenerator.topLevel(
-            descriptor.messageType[i],
-            this,
-            declaredMixins,
-            defaultMixin,
-            usedTopLevelNames,
-            i));
       }
+      messageGenerators.add(MessageGenerator.topLevel(descriptor.messageType[i],
+          this, declaredMixins, defaultMixin, usedTopLevelNames, i));
     }
     for (var i = 0; i < descriptor.extension.length; i++) {
       extensionGenerators.add(ExtensionGenerator.topLevel(
@@ -309,6 +303,10 @@ class FileGenerator extends ProtobufContainer {
 
     for (var p in isarGenerators) {
       p.generate(out);
+    }
+
+    for (var e in enumGenerators) {
+      e.generateForIsar(out);
     }
 
     return out.toString();

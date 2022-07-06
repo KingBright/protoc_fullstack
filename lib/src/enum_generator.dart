@@ -170,6 +170,42 @@ class EnumGenerator extends ProtobufContainer {
     });
   }
 
+  void generateForIsar(IndentingWriter out) {
+    out.addAnnotatedBlock('enum $classname {', '}\n', [
+      NamedLocation(
+          name: classname!, fieldPathSegment: fieldPath!, start: 'enum '.length)
+    ], () {
+      // -----------------------------------------------------------------
+      // Define enum types.
+      for (var i = 0; i < _canonicalValues.length; i++) {
+        var val = _canonicalValues[i];
+        final name = dartNames[val.name]!;
+        if (i == _canonicalValues.length - 1) {
+          out.println('$name;');
+        } else {
+          out.println('$name,');
+        }
+      }
+
+      var protoPrefix = r'$proto';
+      var paramName = classname!.toLowerCase();
+
+      out.addAnnotatedBlock(
+          'factory $classname.fromProto($protoPrefix.$classname $paramName) {',
+          '}', [], () {
+        out.println(' switch($paramName) {');
+        for (var i = 0; i < _canonicalValues.length; i++) {
+          var val = _canonicalValues[i];
+          final name = dartNames[val.name]!;
+          out.println('   case $protoPrefix.$classname.$name:');
+          out.println('     return $name;');
+        }
+        out.println(' }');
+        out.println('return null;');
+      });
+    });
+  }
+
   /// Writes a Dart constant containing the JSON for the EnumProtoDescriptor.
   void generateConstants(IndentingWriter out) {
     var name = getJsonConstant(fileGen!);

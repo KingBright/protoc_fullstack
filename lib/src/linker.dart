@@ -14,14 +14,15 @@ void link(GenerationOptions? options, Iterable<FileGenerator> files) {
   for (var f in files) {
     ctx.registerProtoFile(f);
 
-    for (var m in f.messageGenerators) {
-      m.register(ctx);
-    }
-    for (var e in f.enumGenerators) {
-      e.register(ctx);
-    }
+    // todo: the isar generator and the messageGenerator may duplicated.
     for (var j in f.isarGenerators) {
       j.register(ctx);
+    }
+    // for (var m in f.messageGenerators) {
+    //   m.register(ctx);
+    // }
+    for (var e in f.enumGenerators) {
+      e.register(ctx);
     }
   }
 
