@@ -171,6 +171,11 @@ class EnumGenerator extends ProtobufContainer {
   }
 
   void generateForIsar(IndentingWriter out) {
+    generateEnum(out);
+    generateConverter(out);
+  }
+
+  void generateEnum(IndentingWriter out) {
     out.addAnnotatedBlock('enum $classname {', '}\n', [
       NamedLocation(
           name: classname!, fieldPathSegment: fieldPath!, start: 'enum '.length)
@@ -180,28 +185,41 @@ class EnumGenerator extends ProtobufContainer {
       for (var i = 0; i < _canonicalValues.length; i++) {
         var val = _canonicalValues[i];
         final name = dartNames[val.name]!;
-        if (i == _canonicalValues.length - 1) {
-          out.println('$name;');
-        } else {
-          out.println('$name,');
-        }
+        out.println('$name,');
       }
+    });
+  }
 
-      var protoPrefix = r'$proto';
-      var paramName = classname!.toLowerCase();
+  void generateConverter(IndentingWriter out) {
+    var protoPrefix = r'$proto';
+    var paramName = classname!.toLowerCase();
 
+    out.addAnnotatedBlock('class ${classname}Converter {', '}', [], () {
       out.addAnnotatedBlock(
-          'factory $classname.fromProto($protoPrefix.$classname $paramName) {',
+          'static $classname fromProto($protoPrefix.$classname $paramName) {',
           '}', [], () {
         out.println(' switch($paramName) {');
         for (var i = 0; i < _canonicalValues.length; i++) {
           var val = _canonicalValues[i];
           final name = dartNames[val.name]!;
           out.println('   case $protoPrefix.$classname.$name:');
-          out.println('     return $name;');
+          out.println('     return $classname.$name;');
         }
         out.println(' }');
         out.println('return null;');
+      });
+
+      out.addAnnotatedBlock(
+          'static $protoPrefix.$classname toProto($classname $paramName) {',
+          '}', [], () {
+        out.println(' switch($paramName) {');
+        for (var i = 0; i < _canonicalValues.length; i++) {
+          var val = _canonicalValues[i];
+          final name = dartNames[val.name]!;
+          out.println('   case $classname.$name:');
+          out.println('     return $protoPrefix.$classname.$name;');
+        }
+        out.println(' }');
       });
     });
   }

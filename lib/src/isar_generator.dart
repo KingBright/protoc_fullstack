@@ -225,10 +225,12 @@ class IsarGenerator extends ProtobufContainer {
       out.println();
 
       // normal factory
-      makeCreateFactory(out);
+      generateFactory(out);
 
       // make Pb Factory
-      makeProtoFactory(out);
+      generateProtoFactory(out);
+
+      generateToProto(out);
 
       generateFields(out);
     });
@@ -236,7 +238,7 @@ class IsarGenerator extends ProtobufContainer {
     out.println();
   }
 
-  void makeCreateFactory(IndentingWriter out) {
+  void generateFactory(IndentingWriter out) {
     out.print('factory $classname.create(');
     if (_fieldList.isNotEmpty) {
       out.println('{');
@@ -273,21 +275,26 @@ class IsarGenerator extends ProtobufContainer {
     out.println();
   }
 
-  void makeProtoFactory(IndentingWriter out) {
+  void generateProtoFactory(IndentingWriter out) {
     if (_fieldList.isNotEmpty) {
       var prefix = r'$proto';
       out.print('factory $classname.fromProto($prefix.$classname proto');
       out.println(') {');
       out.println('  final result = $classname();');
       for (final field in _fieldList) {
+        //todo: map type not handled
         if (field.isRepeated || field.isMapField) {
+          var baseType = field.baseType.getDartType(fileGen);
           out.println(
-              '  result.${field.memberNames!.fieldName}.addAll(proto.${field.memberNames!.fieldName} as ${field.getDartType()});');
+              '  result.${field.memberNames!.fieldName}.addAll(proto.${field.memberNames!.fieldName}.map((e) => $baseType.fromProto(e)));');
         } else if (field.baseType.descriptor ==
-                FieldDescriptorProto_Type.TYPE_MESSAGE ||
-            field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_ENUM) {
+            FieldDescriptorProto_Type.TYPE_MESSAGE) {
           out.println(
               '  result.${field.memberNames!.fieldName} = ${field.getDartType()}.fromProto(proto.${field.memberNames!.fieldName});');
+        } else if (field.baseType.descriptor ==
+            FieldDescriptorProto_Type.TYPE_ENUM) {
+          out.println(
+              '  result.${field.memberNames!.fieldName} = ${field.getDartType()}Converter.fromProto(proto.${field.memberNames!.fieldName});');
         } else {
           out.println(
               '  result.${field.memberNames!.fieldName} = proto.${field.memberNames!.fieldName};');
@@ -298,6 +305,40 @@ class IsarGenerator extends ProtobufContainer {
       out.println();
     }
   }
+
+  void generateToProto(IndentingWriter out) {
+    if (_fieldList.isNotEmpty) {
+      var protoPrefix = r'$proto';
+      out.println('$protoPrefix.$classname toProto() {');
+      out.println('  return $protoPrefix.$classname.create()');
+      for (final field in _fieldList) {
+        if (field.isRepeated) {
+          out.println(
+              '  ..${field.memberNames!.fieldName}.addAll(${field.memberNames!.fieldName}.map((e) => e.toProto()))');
+        } else if (field.isMapField) {
+          //todo: map type not handled
+          out.println(
+              '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}');
+        } else if (field.baseType.descriptor ==
+            FieldDescriptorProto_Type.TYPE_MESSAGE) {
+          out.println(
+              '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}.toProto()');
+        } else if (field.baseType.descriptor ==
+            FieldDescriptorProto_Type.TYPE_ENUM) {
+          out.println(
+              '  ..${field.memberNames!.fieldName} = ${field.getDartType()}Converter.toProto(${field.memberNames!.fieldName})');
+        } else {
+          out.println(
+              '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}');
+        }
+      }
+      out.println(';');
+      out.println('}');
+      out.println();
+    }
+  }
+
+  void generateListTransform() {}
 
   void generateFields(IndentingWriter out) {
     //add id annotation and field
