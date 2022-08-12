@@ -213,8 +213,9 @@ class IsarGenerator extends ProtobufContainer {
       OneofEnumGenerator.generate(
           out, oneof.oneofEnumName, _oneofFields[oneof.index]);
     }
-
-    _emitCollectionAnnotation(out);
+    if (_hasId()) {
+      _emitCollectionAnnotation(out);
+    }
     out.addAnnotatedBlock('class $classname {', '}', [
       NamedLocation(
           name: classname, fieldPathSegment: fieldPath, start: 'class '.length)
@@ -236,6 +237,15 @@ class IsarGenerator extends ProtobufContainer {
     });
 
     out.println();
+  }
+
+  bool _hasId() {
+    for (var field in _fieldList) {
+      if (field.descriptor.name == 'id') {
+        return true;
+      }
+    }
+    return false;
   }
 
   void generateFactory(IndentingWriter out) {
@@ -312,6 +322,10 @@ class IsarGenerator extends ProtobufContainer {
       out.println('$protoPrefix.$classname toProto() {');
       out.println('  return $protoPrefix.$classname.create()');
       for (final field in _fieldList) {
+        if (field.descriptor.name == 'id') {
+          // ignore id field, id is always specified by the database.
+          continue;
+        }
         if (field.isRepeated) {
           out.println(
               '  ..${field.memberNames!.fieldName}.addAll(${field.memberNames!.fieldName}.map((e) => e.toProto()))');
@@ -341,15 +355,17 @@ class IsarGenerator extends ProtobufContainer {
   void generateListTransform() {}
 
   void generateFields(IndentingWriter out) {
-    //add id annotation and field
-    out.println('@Id()');
-    out.println('int? id = Isar.autoIncrement;');
-
     for (var field in _fieldList) {
       out.println();
-      var memberFieldPath = List<int>.from(fieldPath)
-        ..addAll([_messageFieldTag, field.sourcePosition!]);
-      generateField(field, out, memberFieldPath);
+      if (field.descriptor.name == 'id') {
+        //add id annotation
+        out.println('@Id()');
+        out.println('int? id = Isar.autoIncrement;');
+      } else {
+        var memberFieldPath = List<int>.from(fieldPath)
+          ..addAll([_messageFieldTag, field.sourcePosition!]);
+        generateField(field, out, memberFieldPath);
+      }
     }
   }
 
