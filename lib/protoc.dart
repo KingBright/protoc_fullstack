@@ -27,6 +27,7 @@ part 'src/file_generator.dart';
 part 'src/grpc_generator.dart';
 part 'src/message_generator.dart';
 part 'src/isar_generator.dart';
+part 'src/bloc_generator.dart';
 part 'src/protobuf_field.dart';
 part 'src/service_generator.dart';
 part 'src/well_known_types.dart';
