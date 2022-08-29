@@ -1,0 +1,266 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+# GNU Make 3.81
+# Copyright (C) 2006  Free Software Foundation, Inc.
+# This is free software; see the source for copying conditions.
+# There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+# This program built for i386-apple-darwin11.3.0
+
+# Make data base, printed on Fri Aug 26 19:59:49 2022
+
+# Variables
+
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# environment
+LC_CTYPE = 
+# environment
+NVM_INC = /Users/jinliang/.nvm/versions/node/v17.0.1/include/node
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# environment
+GRADLE_HOME = /Users/jinliang/Library/gradle
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# automatic
+@F = $(notdir $@)
+# makefile
+CURDIR := /Users/jinliang/workspace/WhatToEat/protoc_fullstack
+# makefile
+SHELL = /bin/sh
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+_ = /usr/bin/make
+# makefile (from `Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# environment
+FLUTTER_HOME = /Users/jinliang/workspace/flutter/flutter-sdk
+# environment
+__CFBundleIdentifier = com.microsoft.VSCode
+# environment
+VSCODE_CWD = /
+# environment
+PATH = /Users/jinliang/.cargo/bin:/usr/local/opt/python@3.9/bin:/Users/jinliang/.nvm/versions/node/v17.0.1/bin:/usr/local/bin/:/opt/local/bin:/opt/local/sbin:/Users/jinliang/cocos2d-x/tools/cocos2d-console/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/opt/go/libexec/bin:/Users/jinliang/workspace/go/bin:/Users/jinliang/Library/gradle/bin:/Users/jinliang/Library/Android/sdk/ndk-bundle:/Users/jinliang/Library/Android/sdk:/Users/jinliang/Library/Android/sdk/platform-tools:/Users/jinliang/Library/Android/sdk/tools:/Users/jinliang/bin:/Users/jinliang/Library/Android/sdk/build-tools/26.0.2:/Users/jinliang/workspace/flutter/flutter-sdk/bin:/Users/jinliang/.pub-cache/bin:/Users/jinliang/workspace/flutter/flutter-sdk/.pub-cache/bin:/Users/jinliang/workspace/depot_tools
+# environment
+LSCOLORS = Gxfxcxdxbxegedabagacad
+# environment
+GOPATH = /Users/jinliang/workspace/go
+# environment
+NVM_BIN = /Users/jinliang/.nvm/versions/node/v17.0.1/bin
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+ANDROID_HOME = /Users/jinliang/Library/Android/sdk
+# default
+.FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
+# environment
+CMAKE_PREFIX_PATH = /usr/local/Cellar/qt5/5.6.1-1/lib/cmake:
+# environment
+HOMEBREW_GITHUB_API_TOKEN = 3ae4540ad494f117f3396c759fa65c9719a85270
+# environment
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Qi0rCIRcvW/Listeners
+# automatic
+%F = $(notdir $%)
+# environment
+PWD = /Users/jinliang/workspace/WhatToEat/protoc_fullstack
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+HOME = /Users/jinliang
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+ANDROID_PRODUCT_OUT = /Users/jinliang/workspace/android/android_source/out/target/product/shamu/
+# default
+MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
+# environment
+VSCODE_CODE_CACHE_PATH = /Users/jinliang/Library/Application Support/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
+# environment
+LOGNAME = jinliang
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+NVM_CD_FLAGS = -q
+# environment
+ZSH = /Users/jinliang/.oh-my-zsh
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+XPC_FLAGS = 0x0
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# environment
+ANDROID_NDK_HOME = /Users/jinliang/Library/Android/sdk/ndk-bundle
+# environment
+PUB_HOSTED_URL = https://pub.flutter-io.cn
+# environment
+JAVA_HOME = /Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home
+# default
+MAKE_VERSION := 3.81
+# environment
+USER = jinliang
+# makefile
+.DEFAULT_GOAL := build-plugin
+# environment
+GOROOT = /usr/local/opt/go/libexec
+# environment
+LESS = -R
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+AAPT_HOME = /Users/jinliang/Library/Android/sdk/build-tools/26.0.2
+# default
+MAKE_COMMAND := /Applications/Xcode.app/Contents/Developer/usr/bin/make
+# default
+.VARIABLES := 
+# environment
+TMPDIR = /var/folders/gh/3p1pf2kj5_5cl235c_424l_w0000gp/T/
+# automatic
+*F = $(notdir $*)
+# environment
+VSCODE_IPC_HOOK = /Users/jinliang/Library/Application Support/Code/1.70.2-main.sock
+# environment
+MallocNanoZone = 0
+# makefile
+MAKEFLAGS = Rrqp
+# environment
+MFLAGS = -Rrqp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+NVM_DIR = /Users/jinliang/.nvm
+# environment
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.134766127.134766133
+# environment
+FLUTTER_STORAGE_BASE_URL = https://storage.flutter-io.cn
+# automatic
++F = $(notdir $+)
+# environment
+__CF_USER_TEXT_ENCODING = 0x1F6:0x0:0x0
+# environment
+COMMAND_MODE = unix2003
+# default
+MAKEFILES := 
+# automatic
+<F = $(notdir $<)
+# environment
+PAGER = less
+# environment
+LC_ALL = C
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# default
+.INCLUDE_DIRS = /usr/local/include
+# environment
+MAKELEVEL := 0
+# environment
+SHLVL = 1
+# environment
+LANG = C
+# environment
+USER_BIN = /Users/jinliang/bin
+# environment
+VSCODE_PID = 1507
+# variable set hash-table stats:
+# Load=81/1024=8%, Rehash=0, Collisions=3/105=3%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 16777220, inode 130025134): 16 files, no impossibilities.
+
+# 16 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+all:
+#  Command-line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2022-07-06 16:18:58
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+proto:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 8):
+	protoc --proto_path test/ test.proto --dart_out=out
+	
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+test-plugin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 5):
+	protoc --proto_path test/ test.proto --isar_out=isar:out --plugin=protoc-gen-isar=bin/protoc_plugin_isar.exe
+	
+
+build-plugin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 2):
+	dart compile exe bin/protoc_plugin_isar.dart
+	
+
+# files hash-table stats:
+# Load=7/1024=1%, Rehash=0, Collisions=1/19=5%
+# VPATH Search Paths
+
+# No `vpath' search paths.
+
+# No general (`VPATH' variable) search path.
+
+# # of strings in strcache: 1
+# # of strcache buffers: 1
+# strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
+# strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
+
+# Finished Make data base on Fri Aug 26 19:59:49 2022
+
+ 
+make: *** No rule to make target `all'.  Stop.
+
