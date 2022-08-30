@@ -14,7 +14,7 @@ class GrpcServiceGenerator {
   ///
   /// The key is the fully qualified name.
   /// Populated by [resolve].
-  final _deps = <String, MessageGenerator>{};
+  final _deps = <String, FullstackGenerator>{};
 
   /// Maps each undefined type to a string describing its location.
   ///
@@ -67,7 +67,7 @@ class GrpcServiceGenerator {
   void _addDependency(GenerationContext ctx, String fqname, String location) {
     if (_deps.containsKey(fqname)) return; // Already added.
 
-    final mg = ctx.getFieldType(fqname) as MessageGenerator?;
+    final mg = ctx.getFieldType(fqname) as FullstackGenerator?;
     if (mg == null) {
       _undefinedDeps[fqname] = location;
       return;
@@ -96,13 +96,234 @@ class GrpcServiceGenerator {
       // TODO(nichite): Throw more actionable error.
       throw 'FAILURE: Unknown type reference ($fqname) for $location';
     }
-    return mg.fileImportPrefix + '.' + mg.classname;
+    return mg.classname;
   }
 
   void generate(IndentingWriter out) {
     _generateClient(out);
     out.println();
     _generateService(out);
+  }
+
+  void generateForBloc(String service, IndentingWriter out) {
+    for (var method in _methods) {
+      /// generate repository
+      ///
+
+      _genRepo(out, method);
+
+      /// generate RepositoryProvider
+      _genRepoProvider(out, method);
+
+      /// generate state
+      _genState(out, method);
+
+      /// events
+      /// base event
+      _genEvents(out, method);
+
+      /// common status
+      _genStatus(out, method);
+
+      /// bloc
+      _genBloc(out, method);
+
+      /// consumer
+      _genConsumer(out, method);
+
+      /// component
+      _genComponent(out, method);
+    }
+  }
+
+  void _genComponent(IndentingWriter out, _GrpcMethod method) {
+    out.addBlock(
+        'class ${method._grpcName}Component extends RepositoryProvider {', '}',
+        () {
+      out.println('''
+${method._grpcName}Component(
+      {super.key,
+      required BlocWidgetBuilder<${method._grpcName}State> builder,
+      required BlocWidgetListener<${method._grpcName}State> listener,
+      BlocBuilderCondition<${method._grpcName}State>? buildWhen,
+      BlocListenerCondition<${method._grpcName}State>? listenWhen,
+      super.lazy})
+      : super(
+            create: (context) => {${method._grpcName}Repository()},
+            child: ${method._grpcName}Consumer(
+              key: key,
+              builder: builder,
+              listener: listener,
+              buildWhen: buildWhen,
+              listenWhen: listenWhen,
+            ));
+''');
+    });
+  }
+
+  void _genConsumer(IndentingWriter out, _GrpcMethod method) {
+    out.addBlock(
+        'class ${method._grpcName}Consumer extends BlocConsumer<${method._grpcName}Bloc, ${method._grpcName}State> {',
+        '}', () {
+      out.println('''
+const ${method._grpcName}Consumer(
+      {super.key,
+      required super.builder,
+      required super.listener,
+      super.buildWhen,
+      super.listenWhen});
+''');
+    });
+  }
+
+  void _genBloc(IndentingWriter out, _GrpcMethod method) {
+    out.addBlock(
+        'class ${method._grpcName}Bloc extends Bloc<${method._grpcName}Event,${method._grpcName}State> {',
+        '}', () {
+      out.println(
+          'final ${method._grpcName}Repository repository = ${method._grpcName}Repository();');
+
+      /// constructor
+      out.addBlock(
+          '''${method._grpcName}Bloc({${method._requestType}? ${method._requestType.toLowerCase()}, ${method._responseType}? ${method._responseType.toLowerCase()}, Error? error})
+          : super(${method._grpcName}State(${method._grpcName}Status.initial, ${method._requestType.toLowerCase()}, ${method._responseType.toLowerCase()}, error)) {''',
+          '}', () {
+        out.println(
+            'on<${method._grpcName}Started>(_on${method._grpcName}Start);');
+        out.println(
+            'on<${method._grpcName}Retry>(_on${method._grpcName}Retry);');
+        out.println('');
+      });
+
+      /// on start
+      out.addBlock(
+          'Future<void> _on${method._grpcName}Start(${method._grpcName}Started event, Emitter<${method._grpcName}State> emit,) async {',
+          '}', () {
+        out.println(
+            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${method._requestType.toLowerCase()}: () => event.${method._requestType.toLowerCase()}));');
+
+        out.addBlock('await emit.forEach<${method._responseType}>(', ');', () {
+          out.println(
+              'repository.${method._grpcName.toLowerCase()}(state.${method._requestType.toLowerCase()}!).asStream(),');
+          out.println(
+              'onData: (${method._responseType.toLowerCase()}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${method._responseType.toLowerCase()}: () => ${method._responseType.toLowerCase()}),');
+          out.println(
+              'onError: (err, stackTrace) => state.copyWith(status: () => ${method._grpcName}Status.failure, error: () => err is Error ? err : Error()),');
+        });
+      });
+
+      /// on retry
+      out.addBlock(
+          'Future<void> _on${method._grpcName}Retry(${method._grpcName}Retry event, Emitter<${method._grpcName}State> emit,) async {',
+          '}', () {
+        out.addBlock('if (event.prevError != null) {', '}', () {
+          out.println('// todo: do something according the previous error');
+        });
+
+        out.println(
+            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${method._requestType.toLowerCase()}: () => event.${method._requestType.toLowerCase()}));');
+
+        out.addBlock('await emit.forEach<${method._responseType}>(', ');', () {
+          out.println(
+              'repository.${method._grpcName.toLowerCase()}(state.${method._requestType.toLowerCase()}!).asStream(),');
+          out.println(
+              'onData: (${method._responseType.toLowerCase()}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${method._responseType.toLowerCase()}: () => ${method._responseType.toLowerCase()}),');
+          out.println(
+              'onError: (err, stackTrace) => state.copyWith(status: () => ${method._grpcName}Status.failure, error: () => err is Error ? err : Error()),');
+        });
+      });
+    });
+  }
+
+  void _genStatus(IndentingWriter out, _GrpcMethod method) {
+    out.println(
+        'enum ${method._grpcName}Status { initial, loading, success, failure }');
+  }
+
+  void _genEvents(IndentingWriter out, _GrpcMethod method) {
+    out.println('abstract class ${method._grpcName}Event extends Equatable {}');
+
+    /// start event
+    out.addBlock(
+        'class ${method._grpcName}Started extends ${method._grpcName}Event {',
+        '}', () {
+      out.println(
+          '${method._grpcName}Started(this.${method._requestType.toLowerCase()});');
+      out.println(
+          'final ${method._requestType} ${method._requestType.toLowerCase()};');
+      out.println('@override');
+      out.println(
+          'List<Object?> get props => [${method._requestType.toLowerCase()}];');
+    });
+
+    /// retry event
+    out.addBlock(
+        'class ${method._grpcName}Retry extends ${method._grpcName}Event {',
+        '}', () {
+      out.println(
+          '${method._grpcName}Retry(this.${method._requestType.toLowerCase()}, [this.prevError]);');
+      out.println(
+          'final ${method._requestType} ${method._requestType.toLowerCase()};');
+      out.println('final BlocError? prevError;');
+      out.println('@override');
+      out.println(
+          'List<Object?> get props => [${method._requestType.toLowerCase()}, prevError];');
+    });
+  }
+
+  void _genState(IndentingWriter out, _GrpcMethod method) {
+    out.addBlock('class ${method._grpcName}State extends Equatable {', '}', () {
+      out.println(
+          'const ${method._grpcName}State(this.status, this.${method._requestType.toLowerCase()}, this.${method._responseType.toLowerCase()}, this.error);');
+      out.println('final ${method._grpcName}Status status;');
+      out.println(
+          'final ${method._requestType}? ${method._requestType.toLowerCase()};');
+      out.println(
+          'final ${method._responseType}? ${method._responseType.toLowerCase()};');
+      out.println('final Error? error;');
+
+      out.println('@override');
+      out.println(
+          'List<Object?> get props => [status, ${method._requestType.toLowerCase()}, ${method._responseType.toLowerCase()}, error];');
+
+      out.println('''
+${method._grpcName}State copyWith({
+    ${method._grpcName}Status Function()? status,
+    ${method._requestType} Function()? ${method._requestType.toLowerCase()},
+    ${method._responseType} Function()? ${method._responseType.toLowerCase()},
+    Error? Function()? error,
+  }) {
+    return ${method._grpcName}State(
+      status != null ? status() : this.status,
+      ${method._requestType.toLowerCase()} != null ? ${method._requestType.toLowerCase()}() : this.${method._requestType.toLowerCase()},
+      ${method._responseType.toLowerCase()} != null ? ${method._responseType.toLowerCase()}() : this.${method._responseType.toLowerCase()},
+      error != null ? error() : this.error,
+    );
+  }
+''');
+    });
+  }
+
+  void _genRepoProvider(IndentingWriter out, _GrpcMethod method) {
+    out.addBlock(
+        'class ${method._grpcName}RepositoryProvider extends RepositoryProvider {',
+        '}', () {
+      out.println(
+          '${method._grpcName}RepositoryProvider({super.key, super.child, super.lazy})');
+      out.println(
+          '    : super(create: (context) => {${method._grpcName}Repository()});');
+    });
+  }
+
+  void _genRepo(IndentingWriter out, _GrpcMethod method) {
+    out.addBlock('class ${method._grpcName}Repository {', '}', () {
+      out.addBlock(
+          'Future<${method._responseType}> ${method._dartName}(${method._requestType} ${method._requestType.toLowerCase()}) async {',
+          '}', () {
+        out.println(
+            'return $_clientClassname.getInstance().${method._dartName}(${method._requestType.toLowerCase()});');
+      });
+    });
   }
 
   void _generateClient(IndentingWriter out) {

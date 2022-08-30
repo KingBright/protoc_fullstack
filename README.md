@@ -8,20 +8,19 @@ When we come up with an idea and want to make a minimal demo, we will do many wo
 
 * db source code: currently we use isar as the backend
 * client state management: currently use bloc
-* server side code: gprc and glue code to db
 * client side code: grpc and glue code to data model and state management code
+* server side code: grpc and glue code to db
 
 ## How to use
 
 * STEP1 : compile the exe file
 
 ```
-dart compile exe bin/protoc_plugin_isar.dart
+dart compile exe bin/protoc_plugin_fullstack.dart
 ```
 
-* STEP2 : a very protoc styled call just like following (if want to generate isar code, just include the `isar` option in the out parameter)
+* STEP2 : a very protoc styled call just like following (if want to generate isar code, just include the `fullstack` option in the out parameter)
 
 ```
-protoc --proto_path test/ test.proto --isar_out=isar:out --plugin=protoc-gen-isar=bin/protoc_plugin_isar.exe
+protoc --proto_path test/ test.proto --fullstack_out=fullstack:out --plugin=protoc-gen-fullstack=bin/protoc_plugin_fullstack.exe
 ```
-

@@ -50,12 +50,12 @@ bool genericOptionsParser(CodeGeneratorRequest request,
 class GenerationOptions {
   final bool useGrpc;
   final bool generateMetadata;
-  final bool generateIsar;
+  final bool generateFullstack;
 
   GenerationOptions(
       {this.useGrpc = false,
       this.generateMetadata = false,
-      this.generateIsar = false});
+      this.generateFullstack = false});
 }
 
 /// A parser for a name-value pair option. Options parsed in
@@ -95,16 +95,16 @@ class GenerateMetadataParser implements SingleOptionParser {
   }
 }
 
-class GenerateIsarParser implements SingleOptionParser {
-  bool generateIsar = false;
+class GenerateFullstackParser implements SingleOptionParser {
+  bool generateFullstack = false;
 
   @override
   void parse(String name, String? value, OnError onError) {
     if (value != null) {
-      onError('Invalid metadata option. No Value expected.');
+      onError('Invalid fs option. No Value expected.');
       return;
     }
-    generateIsar = true;
+    generateFullstack = true;
   }
 }
 
@@ -121,14 +121,14 @@ GenerationOptions? parseGenerationOptions(
   newParsers['grpc'] = grpcOptionParser;
   final generateMetadataParser = GenerateMetadataParser();
   newParsers['generate_kythe_info'] = generateMetadataParser;
-  final generateIsarParser = GenerateIsarParser();
-  newParsers['isar'] = generateIsarParser;
+  final generateFullstackParser = GenerateFullstackParser();
+  newParsers['fullstack'] = generateFullstackParser;
 
   if (genericOptionsParser(request, response, newParsers)) {
     return GenerationOptions(
         useGrpc: grpcOptionParser.grpcEnabled,
         generateMetadata: generateMetadataParser.generateKytheInfo,
-        generateIsar: generateIsarParser.generateIsar);
+        generateFullstack: generateFullstackParser.generateFullstack);
   }
   return null;
 }

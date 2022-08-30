@@ -15,7 +15,7 @@ void link(GenerationOptions? options, Iterable<FileGenerator> files) {
     ctx.registerProtoFile(f);
 
     // todo: the isar generator and the messageGenerator may duplicated.
-    for (var j in f.isarGenerators) {
+    for (var j in f.fullstackGenerators) {
       j.register(ctx);
     }
     // for (var m in f.messageGenerators) {

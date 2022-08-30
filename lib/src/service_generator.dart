@@ -14,13 +14,13 @@ class ServiceGenerator {
   ///
   /// The key is the fully qualified name with a leading '.'.
   /// Populated by [resolve].
-  final _deps = <String, IsarGenerator>{};
+  final _deps = <String, FullstackGenerator>{};
 
   /// The message types needed transitively by this service.
   ///
   /// The key is the fully qualified name with a leading '.'.
   /// Populated by [resolve].
-  final _transitiveDeps = <String, IsarGenerator>{};
+  final _transitiveDeps = <String, FullstackGenerator>{};
 
   /// Maps each undefined type to a string describing its location.
   ///
@@ -66,7 +66,7 @@ class ServiceGenerator {
   void _addDependency(GenerationContext ctx, String fqname, String location) {
     if (_deps.containsKey(fqname)) return; // Already added.
 
-    final mg = ctx.getFieldType(fqname) as IsarGenerator?;
+    final mg = ctx.getFieldType(fqname) as FullstackGenerator?;
     if (mg == null) {
       _undefinedDeps[fqname] = location;
       return;
@@ -74,7 +74,7 @@ class ServiceGenerator {
     _addDepsRecursively(mg, 0);
   }
 
-  void _addDepsRecursively(IsarGenerator mg, int depth) {
+  void _addDepsRecursively(FullstackGenerator mg, int depth) {
     if (_transitiveDeps.containsKey(mg.dottedName)) {
       // Already added, but perhaps at a different depth.
       if (depth == 0) _deps[mg.dottedName] = mg;
@@ -86,7 +86,7 @@ class ServiceGenerator {
     for (var field in mg._fieldList) {
       if (field.baseType.isGroup || field.baseType.isMessage) {
         _addDepsRecursively(
-            field.baseType.generator as IsarGenerator, depth + 1);
+            field.baseType.generator as FullstackGenerator, depth + 1);
       }
     }
   }

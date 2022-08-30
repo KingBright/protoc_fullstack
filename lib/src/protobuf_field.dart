@@ -113,7 +113,7 @@ class ProtobufField {
   /// `map<key_type, value_type> map_field = N`.
   bool get isMapField {
     if (!isRepeated || !baseType.isMessage) return false;
-    final generator = baseType.generator as IsarGenerator;
+    final generator = baseType.generator as FullstackGenerator;
     return generator._descriptor.options.hasMapEntry();
   }
 

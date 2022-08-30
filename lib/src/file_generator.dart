@@ -127,7 +127,7 @@ class FileGenerator extends ProtobufContainer {
 
   final enumGenerators = <EnumGenerator>[];
   final messageGenerators = <MessageGenerator>[];
-  final isarGenerators = <IsarGenerator>[];
+  final fullstackGenerators = <FullstackGenerator>[];
   final extensionGenerators = <ExtensionGenerator>[];
   final clientApiGenerators = <ClientApiGenerator>[];
   final serviceGenerators = <ServiceGenerator>[];
@@ -178,9 +178,14 @@ class FileGenerator extends ProtobufContainer {
           descriptor.enumType[i], this, usedTopLevelNames, i));
     }
     for (var i = 0; i < descriptor.messageType.length; i++) {
-      if (options.generateIsar) {
-        isarGenerators.add(IsarGenerator.topLevel(descriptor.messageType[i],
-            this, declaredMixins, defaultMixin, usedTopLevelNames, i));
+      if (options.generateFullstack) {
+        fullstackGenerators.add(FullstackGenerator.topLevel(
+            descriptor.messageType[i],
+            this,
+            declaredMixins,
+            defaultMixin,
+            usedTopLevelNames,
+            i));
       }
       messageGenerators.add(MessageGenerator.topLevel(descriptor.messageType[i],
           this, declaredMixins, defaultMixin, usedTopLevelNames, i));
@@ -190,15 +195,15 @@ class FileGenerator extends ProtobufContainer {
           descriptor.extension[i], this, usedExtensionNames, i));
     }
     for (var service in descriptor.service) {
-      if (options.useGrpc) {
-        grpcGenerators.add(GrpcServiceGenerator(service, this));
-      } else {
-        var serviceGen =
-            ServiceGenerator(service, this, usedTopLevelServiceNames);
-        serviceGenerators.add(serviceGen);
-        clientApiGenerators
-            .add(ClientApiGenerator(serviceGen, usedTopLevelNames));
-      }
+      // if (options.useGrpc) {
+      grpcGenerators.add(GrpcServiceGenerator(service, this));
+      // } else {
+      //   var serviceGen =
+      //       ServiceGenerator(service, this, usedTopLevelServiceNames);
+      //   serviceGenerators.add(serviceGen);
+      //   clientApiGenerators
+      //       .add(ClientApiGenerator(serviceGen, usedTopLevelNames));
+      // }
     }
   }
 
@@ -210,8 +215,8 @@ class FileGenerator extends ProtobufContainer {
     for (var m in messageGenerators) {
       m.resolve(ctx);
     }
-    for (var j in isarGenerators) {
-      j.resolve(ctx);
+    for (var f in fullstackGenerators) {
+      f.resolve(ctx);
     }
     for (var x in extensionGenerators) {
       x.resolve(ctx);
@@ -263,7 +268,9 @@ class FileGenerator extends ProtobufContainer {
       // makeFile('.pb.dart', mainWriter.toString()),
       // makeFile('.pbenum.dart', enumWriter.toString()),
       // makeFile('.pbjson.dart', generateJsonFile(config)),
+      makeFile('.fs.dart', generateFullstack(getFileName(), config)),
       makeFile('.isar.dart', generateIsarFile(getFileName(), config)),
+      makeFile('.bloc.dart', generateBlocFile(getFileName(), config))
     ];
 
     if (options.generateMetadata) {
@@ -288,6 +295,43 @@ class FileGenerator extends ProtobufContainer {
   IndentingWriter makeWriter() => IndentingWriter(
       filename: options.generateMetadata ? descriptor.name : null);
 
+  String generateBlocFile(String fileName,
+      [OutputConfiguration config = const DefaultOutputConfiguration()]) {
+    if (!_linked) throw StateError('not linked');
+    var out = makeWriter();
+
+    writeBlocHeader(fileName, out);
+
+    for (var f in grpcGenerators) {
+      f.generateForBloc(f._fullServiceName, out);
+    }
+
+    return out.toString();
+  }
+
+  String generateFullstack(String fileName,
+      [OutputConfiguration config = const DefaultOutputConfiguration()]) {
+    if (!_linked) throw StateError('not linked');
+    var out = makeWriter();
+    _writeHeading(out);
+    out.println("import '$fileName.pb.dart';");
+    out.println("import '$fileName.pbenum.dart';");
+    out.println("import '$fileName.pbgrpc.dart';");
+    out.println("import '$fileName.pbjson.dart';");
+
+    out.println();
+
+    out.println("import 'package:grpc/grpc.dart';");
+    out.println("import 'package:isar/isar.dart';");
+    out.println("import 'package:equatable/equatable.dart';");
+    out.println("import 'package:flutter_bloc/flutter_bloc.dart';");
+
+    out.println("part '$fileName.bloc.dart';");
+
+    return out.toString();
+  }
+
+  /// Generate isar template file
   String generateIsarFile(String fileName,
       [OutputConfiguration config = const DefaultOutputConfiguration()]) {
     if (!_linked) throw StateError('not linked');
@@ -301,8 +345,8 @@ class FileGenerator extends ProtobufContainer {
     out.println("part '$fileName.isar.g.dart';");
     out.println();
 
-    for (var p in isarGenerators) {
-      p.generate(out);
+    for (var f in fullstackGenerators) {
+      f.generateForIsar(out);
     }
 
     for (var e in enumGenerators) {
@@ -350,7 +394,15 @@ class FileGenerator extends ProtobufContainer {
     return out;
   }
 
-  /// Writes the header and imports for the .pb.dart file.
+  /// Writes the header and imports for the .bloc.dart file.
+  void writeBlocHeader(String fileName, IndentingWriter out,
+      [OutputConfiguration config = const DefaultOutputConfiguration()]) {
+    _writeHeading(out);
+    out.println("part of '$fileName.fs.dart';");
+    out.println();
+  }
+
+  /// Writes the header and imports for the .isar.dart file.
   void writeIsarHeader(IndentingWriter out,
       [OutputConfiguration config = const DefaultOutputConfiguration()]) {
     _writeHeading(out);
@@ -372,8 +424,8 @@ class FileGenerator extends ProtobufContainer {
   }
 
   bool get _needsFixnumImport {
-    for (var m in isarGenerators) {
-      if (m.needsFixnumImport) return true;
+    for (var f in fullstackGenerators) {
+      if (f.needsFixnumImport) return true;
     }
     for (var x in extensionGenerators) {
       if (x.needsFixnumImport) return true;
@@ -382,7 +434,7 @@ class FileGenerator extends ProtobufContainer {
   }
 
   bool get _needsProtobufImport =>
-      isarGenerators.isNotEmpty ||
+      fullstackGenerators.isNotEmpty ||
       extensionGenerators.isNotEmpty ||
       clientApiGenerators.isNotEmpty;
 
@@ -611,7 +663,7 @@ class FileGenerator extends ProtobufContainer {
 //  Generated code. Do not modify.
 //  source: ${descriptor.name}
 //
-// @dart = 2.12
+// @dart = 2.17
 // ignore_for_file: ${ignores.join(',')}
 ''');
   }
