@@ -105,11 +105,11 @@ class GrpcServiceGenerator {
     _generateService(out);
   }
 
+  void generateForClient(IndentingWriter out) {}
+
   void generateForBloc(String service, IndentingWriter out) {
     for (var method in _methods) {
       /// generate repository
-      ///
-
       _genRepo(out, method);
 
       /// generate RepositoryProvider
@@ -185,8 +185,8 @@ const ${method._grpcName}Consumer(
 
       /// constructor
       out.addBlock(
-          '''${method._grpcName}Bloc({${method._requestType}? ${method._requestType.toLowerCase()}, ${method._responseType}? ${method._responseType.toLowerCase()}, Error? error})
-          : super(${method._grpcName}State(${method._grpcName}Status.initial, ${method._requestType.toLowerCase()}, ${method._responseType.toLowerCase()}, error)) {''',
+          '''${method._grpcName}Bloc({${method._requestType}? ${lowerCaseFirstLetter(method._requestType)}, ${method._responseType}? ${lowerCaseFirstLetter(method._responseType)}, Error? error})
+          : super(${method._grpcName}State(${method._grpcName}Status.initial, ${lowerCaseFirstLetter(method._requestType)}, ${lowerCaseFirstLetter(method._responseType)}, error)) {''',
           '}', () {
         out.println(
             'on<${method._grpcName}Started>(_on${method._grpcName}Start);');
@@ -200,13 +200,13 @@ const ${method._grpcName}Consumer(
           'Future<void> _on${method._grpcName}Start(${method._grpcName}Started event, Emitter<${method._grpcName}State> emit,) async {',
           '}', () {
         out.println(
-            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${method._requestType.toLowerCase()}: () => event.${method._requestType.toLowerCase()}));');
+            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${lowerCaseFirstLetter(method._requestType)}: () => event.${lowerCaseFirstLetter(method._requestType)}));');
 
         out.addBlock('await emit.forEach<${method._responseType}>(', ');', () {
           out.println(
-              'repository.${method._grpcName.toLowerCase()}(state.${method._requestType.toLowerCase()}!).asStream(),');
+              'repository.${lowerCaseFirstLetter(method._grpcName)}(state.${lowerCaseFirstLetter(method._requestType)}!).asStream(),');
           out.println(
-              'onData: (${method._responseType.toLowerCase()}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${method._responseType.toLowerCase()}: () => ${method._responseType.toLowerCase()}),');
+              'onData: (${lowerCaseFirstLetter(method._responseType)}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${lowerCaseFirstLetter(method._responseType)}: () => ${lowerCaseFirstLetter(method._responseType)}),');
           out.println(
               'onError: (err, stackTrace) => state.copyWith(status: () => ${method._grpcName}Status.failure, error: () => err is Error ? err : Error()),');
         });
@@ -221,13 +221,13 @@ const ${method._grpcName}Consumer(
         });
 
         out.println(
-            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${method._requestType.toLowerCase()}: () => event.${method._requestType.toLowerCase()}));');
+            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${lowerCaseFirstLetter(method._requestType)}: () => event.${lowerCaseFirstLetter(method._requestType)}));');
 
         out.addBlock('await emit.forEach<${method._responseType}>(', ');', () {
           out.println(
-              'repository.${method._grpcName.toLowerCase()}(state.${method._requestType.toLowerCase()}!).asStream(),');
+              'repository.${lowerCaseFirstLetter(method._grpcName)}(state.${lowerCaseFirstLetter(method._requestType)}!).asStream(),');
           out.println(
-              'onData: (${method._responseType.toLowerCase()}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${method._responseType.toLowerCase()}: () => ${method._responseType.toLowerCase()}),');
+              'onData: (${lowerCaseFirstLetter(method._responseType)}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${lowerCaseFirstLetter(method._responseType)}: () => ${lowerCaseFirstLetter(method._responseType)}),');
           out.println(
               'onError: (err, stackTrace) => state.copyWith(status: () => ${method._grpcName}Status.failure, error: () => err is Error ? err : Error()),');
         });
@@ -248,12 +248,12 @@ const ${method._grpcName}Consumer(
         'class ${method._grpcName}Started extends ${method._grpcName}Event {',
         '}', () {
       out.println(
-          '${method._grpcName}Started(this.${method._requestType.toLowerCase()});');
+          '${method._grpcName}Started(this.${lowerCaseFirstLetter(method._requestType)});');
       out.println(
-          'final ${method._requestType} ${method._requestType.toLowerCase()};');
+          'final ${method._requestType} ${lowerCaseFirstLetter(method._requestType)};');
       out.println('@override');
       out.println(
-          'List<Object?> get props => [${method._requestType.toLowerCase()}];');
+          'List<Object?> get props => [${lowerCaseFirstLetter(method._requestType)}];');
     });
 
     /// retry event
@@ -261,42 +261,42 @@ const ${method._grpcName}Consumer(
         'class ${method._grpcName}Retry extends ${method._grpcName}Event {',
         '}', () {
       out.println(
-          '${method._grpcName}Retry(this.${method._requestType.toLowerCase()}, [this.prevError]);');
+          '${method._grpcName}Retry(this.${lowerCaseFirstLetter(method._requestType)}, [this.prevError]);');
       out.println(
-          'final ${method._requestType} ${method._requestType.toLowerCase()};');
+          'final ${method._requestType} ${lowerCaseFirstLetter(method._requestType)};');
       out.println('final BlocError? prevError;');
       out.println('@override');
       out.println(
-          'List<Object?> get props => [${method._requestType.toLowerCase()}, prevError];');
+          'List<Object?> get props => [${lowerCaseFirstLetter(method._requestType)}, prevError];');
     });
   }
 
   void _genState(IndentingWriter out, _GrpcMethod method) {
     out.addBlock('class ${method._grpcName}State extends Equatable {', '}', () {
       out.println(
-          'const ${method._grpcName}State(this.status, this.${method._requestType.toLowerCase()}, this.${method._responseType.toLowerCase()}, this.error);');
+          'const ${method._grpcName}State(this.status, this.${lowerCaseFirstLetter(method._requestType)}, this.${lowerCaseFirstLetter(method._responseType)}, this.error);');
       out.println('final ${method._grpcName}Status status;');
       out.println(
-          'final ${method._requestType}? ${method._requestType.toLowerCase()};');
+          'final ${method._requestType}? ${lowerCaseFirstLetter(method._requestType)};');
       out.println(
-          'final ${method._responseType}? ${method._responseType.toLowerCase()};');
+          'final ${method._responseType}? ${lowerCaseFirstLetter(method._responseType)};');
       out.println('final Error? error;');
 
       out.println('@override');
       out.println(
-          'List<Object?> get props => [status, ${method._requestType.toLowerCase()}, ${method._responseType.toLowerCase()}, error];');
+          'List<Object?> get props => [status, ${lowerCaseFirstLetter(method._requestType)}, ${lowerCaseFirstLetter(method._responseType)}, error];');
 
       out.println('''
 ${method._grpcName}State copyWith({
     ${method._grpcName}Status Function()? status,
-    ${method._requestType} Function()? ${method._requestType.toLowerCase()},
-    ${method._responseType} Function()? ${method._responseType.toLowerCase()},
+    ${method._requestType} Function()? ${lowerCaseFirstLetter(method._requestType)},
+    ${method._responseType} Function()? ${lowerCaseFirstLetter(method._responseType)},
     Error? Function()? error,
   }) {
     return ${method._grpcName}State(
       status != null ? status() : this.status,
-      ${method._requestType.toLowerCase()} != null ? ${method._requestType.toLowerCase()}() : this.${method._requestType.toLowerCase()},
-      ${method._responseType.toLowerCase()} != null ? ${method._responseType.toLowerCase()}() : this.${method._responseType.toLowerCase()},
+      ${lowerCaseFirstLetter(method._requestType)} != null ? ${lowerCaseFirstLetter(method._requestType)}() : this.${lowerCaseFirstLetter(method._requestType)},
+      ${lowerCaseFirstLetter(method._responseType)} != null ? ${lowerCaseFirstLetter(method._responseType)}() : this.${lowerCaseFirstLetter(method._responseType)},
       error != null ? error() : this.error,
     );
   }
@@ -318,10 +318,10 @@ ${method._grpcName}State copyWith({
   void _genRepo(IndentingWriter out, _GrpcMethod method) {
     out.addBlock('class ${method._grpcName}Repository {', '}', () {
       out.addBlock(
-          'Future<${method._responseType}> ${method._dartName}(${method._requestType} ${method._requestType.toLowerCase()}) async {',
+          'Future<${method._responseType}> ${method._dartName}(${method._requestType} ${lowerCaseFirstLetter(method._requestType)}) async {',
           '}', () {
         out.println(
-            'return $_clientClassname.getInstance().${method._dartName}(${method._requestType.toLowerCase()});');
+            'return $_clientClassname.getInstance().${method._dartName}(${lowerCaseFirstLetter(method._requestType)});');
       });
     });
   }

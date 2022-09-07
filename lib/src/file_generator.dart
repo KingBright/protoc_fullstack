@@ -270,7 +270,8 @@ class FileGenerator extends ProtobufContainer {
       // makeFile('.pbjson.dart', generateJsonFile(config)),
       makeFile('.fs.dart', generateFullstack(getFileName(), config)),
       makeFile('.isar.dart', generateIsarFile(getFileName(), config)),
-      makeFile('.bloc.dart', generateBlocFile(getFileName(), config))
+      makeFile('.bloc.dart', generateBlocFile(getFileName(), config)),
+      makeFile('.client.dart', generateBlocFile(getFileName(), config)),
     ];
 
     if (options.generateMetadata) {
@@ -294,6 +295,25 @@ class FileGenerator extends ProtobufContainer {
   /// Creates an IndentingWriter with metadata generation enabled or disabled.
   IndentingWriter makeWriter() => IndentingWriter(
       filename: options.generateMetadata ? descriptor.name : null);
+
+  String generateClientFile(String fileName,
+      [OutputConfiguration config = const DefaultOutputConfiguration()]) {
+    if (!_linked) throw StateError('not linked');
+    var out = makeWriter();
+    _writeClientHeader(out, fileName);
+
+    for (var f in grpcGenerators) {
+      f.generateForBloc(f._fullServiceName, out);
+    }
+
+    return out.toString();
+  }
+
+  void _writeClientHeader(IndentingWriter out, String fileName) {
+    _writeHeading(out);
+    out.println("part of '$fileName.fs.dart';");
+    out.println();
+  }
 
   String generateBlocFile(String fileName,
       [OutputConfiguration config = const DefaultOutputConfiguration()]) {
