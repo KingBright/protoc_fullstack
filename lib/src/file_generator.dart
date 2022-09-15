@@ -271,7 +271,7 @@ class FileGenerator extends ProtobufContainer {
       makeFile('.fs.dart', generateFullstack(getFileName(), config)),
       makeFile('.isar.dart', generateIsarFile(getFileName(), config)),
       makeFile('.bloc.dart', generateBlocFile(getFileName(), config)),
-      makeFile('.client.dart', generateBlocFile(getFileName(), config)),
+      makeFile('.client.dart', generateClientFile(getFileName(), config)),
     ];
 
     if (options.generateMetadata) {
@@ -303,7 +303,7 @@ class FileGenerator extends ProtobufContainer {
     _writeClientHeader(out, fileName);
 
     for (var f in grpcGenerators) {
-      f.generateForBloc(f._fullServiceName, out);
+      f.generateForClient(f._fullServiceName, out);
     }
 
     return out.toString();

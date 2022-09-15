@@ -122,7 +122,7 @@ GenerationOptions? parseGenerationOptions(
   final generateMetadataParser = GenerateMetadataParser();
   newParsers['generate_kythe_info'] = generateMetadataParser;
   final generateFullstackParser = GenerateFullstackParser();
-  newParsers['fullstack'] = generateFullstackParser;
+  newParsers['fs'] = generateFullstackParser;
 
   if (genericOptionsParser(request, response, newParsers)) {
     return GenerationOptions(

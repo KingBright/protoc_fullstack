@@ -105,7 +105,7 @@ class GrpcServiceGenerator {
     _generateService(out);
   }
 
-  void generateForClient(IndentingWriter out) {}
+  void generateForClient(String service, IndentingWriter out) {}
 
   void generateForBloc(String service, IndentingWriter out) {
     for (var method in _methods) {
@@ -133,7 +133,29 @@ class GrpcServiceGenerator {
 
       /// component
       _genComponent(out, method);
+
+      /// page
+      _genPage(out, service);
     }
+  }
+
+  void _genPage(IndentingWriter out, String service) {
+    out.addBlock('class ${service}Page extends StatefulWidget {', '}', () {
+      out.println('final Widget Function builder;');
+      out.println(
+          'const ${service}Page(this.builder, { Key? key }) : super(key: key);');
+
+      out.println('@override');
+      out.println('${service}State createState() => ${service}State();');
+    });
+
+    out.addBlock('class ${service}State extends State<${service}Page> {', '}',
+        () {
+      out.println('@override');
+      out.addBlock('Widget build(BuildContext context) {', '}', () {
+        out.println('return widget.builder(context);');
+      });
+    });
   }
 
   void _genComponent(IndentingWriter out, _GrpcMethod method) {
