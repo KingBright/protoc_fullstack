@@ -250,9 +250,10 @@ class FileGenerator extends ProtobufContainer {
     CodeGeneratorResponse_File makeFile(String extension, String content) {
       var protoUrl = Uri.file(descriptor.name);
       var dartUrl = config.outputPathFor(protoUrl, extension);
+      var format = DartFormatter();
       return CodeGeneratorResponse_File()
         ..name = dartUrl.path
-        ..content = content;
+        ..content = format.format(content);
     }
 
     String getFileName() {
@@ -334,19 +335,22 @@ class FileGenerator extends ProtobufContainer {
     if (!_linked) throw StateError('not linked');
     var out = makeWriter();
     _writeHeading(out);
+    out.println("import 'package:equatable/equatable.dart';");
+    out.println("import 'package:fullstack_base/fullstack_base.dart';");
+    out.println("import 'package:flutter/widgets.dart';");
+    out.println("import 'package:flutter_bloc/flutter_bloc.dart';");
+    out.println("import 'package:grpc/grpc.dart';");
+    out.println("import 'package:isar/isar.dart';");
+
+    out.println();
+
     out.println("import '$fileName.pb.dart';");
     out.println("import '$fileName.pbenum.dart';");
     out.println("import '$fileName.pbgrpc.dart';");
     out.println("import '$fileName.pbjson.dart';");
 
-    out.println();
-
-    out.println("import 'package:grpc/grpc.dart';");
-    out.println("import 'package:isar/isar.dart';");
-    out.println("import 'package:equatable/equatable.dart';");
-    out.println("import 'package:flutter_bloc/flutter_bloc.dart';");
-
     out.println("part '$fileName.bloc.dart';");
+    out.println("part '$fileName.client.dart';");
 
     return out.toString();
   }

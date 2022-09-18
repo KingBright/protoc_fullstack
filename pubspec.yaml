@@ -10,4 +10,4 @@ dev_dependencies:
   lints: ^2.0.0
   test: ^1.16.0
 
-dependencies: {dart_style: ^2.2.3, fixnum: ^1.0.1, protobuf: ^2.1.0}
+dependencies: {dart_style: ^2.2.4, fixnum: ^1.0.1, protobuf: ^2.1.0}

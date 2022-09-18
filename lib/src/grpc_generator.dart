@@ -105,7 +105,57 @@ class GrpcServiceGenerator {
     _generateService(out);
   }
 
-  void generateForClient(String service, IndentingWriter out) {}
+  void generateForClient(String service, IndentingWriter out) {
+    _genWrapper(out);
+  }
+
+  void _genWrapper(IndentingWriter out) {
+    out.addBlock('class ${_clientClassname}Wrapper extends BaseClient {', '}',
+        () {
+      out.println('late $_clientClassname _stub;');
+      out.addBlock(
+          '${_clientClassname}Wrapper(String host,int port) : super(host, port) {',
+          '}', () {
+        out.println('_stub = $_clientClassname(channel, options: options);');
+      });
+
+      out.println('static ${_clientClassname}Wrapper? _instance;');
+
+      out.addBlock('static init(String host, int port) {', '}', () {
+        out.println('_instance = ${_clientClassname}Wrapper(host, port);');
+      });
+
+      out.addBlock('static getInstance() {', '}', () {
+        out.println('return _instance!;');
+      });
+
+      for (var method in _methods) {
+        _genMethodWrapper(out, method);
+      }
+    });
+  }
+
+  void _genMethodWrapper(IndentingWriter out, _GrpcMethod method) {
+    out.addBlock(
+        '${method._serverStreaming ? 'Stream<${method._responseType}>' : 'Future<${method._responseType}>'} ${lowerCaseFirstLetter(method._grpcName)}(${method._clientStreaming ? 'Stream<${method._requestType}>' : method._requestType} ${lowerCaseFirstLetter(method._requestType)}) ${method._serverStreaming ? '' : 'async'} {',
+        '}', () {
+      out.println("logger.d('${method._grpcName} start');");
+      out.addBlock('try {', '}', () {
+        out.println(
+            'var result = ${method._serverStreaming ? '' : 'await'} _stub.${lowerCaseFirstLetter(method._grpcName)}(${lowerCaseFirstLetter(method._requestType)});');
+        var result = r'$result';
+        out.println("logger.d('${method._grpcName} success: $result');");
+        out.println('return result;');
+      });
+
+      out.addBlock('catch (e, trace) {', '}', () {
+        var e = r'$e';
+        var trace = r'$trace';
+        out.println("logger.e('error: $e $trace');");
+        out.println('rethrow;');
+      });
+    });
+  }
 
   void generateForBloc(String service, IndentingWriter out) {
     for (var method in _methods) {
@@ -135,21 +185,23 @@ class GrpcServiceGenerator {
       _genComponent(out, method);
 
       /// page
-      _genPage(out, service);
+      _genPage(out, method);
     }
   }
 
-  void _genPage(IndentingWriter out, String service) {
-    out.addBlock('class ${service}Page extends StatefulWidget {', '}', () {
-      out.println('final Widget Function builder;');
+  void _genPage(IndentingWriter out, _GrpcMethod method) {
+    String methodName = method._grpcName;
+    out.addBlock('class ${methodName}Page extends StatefulWidget {', '}', () {
+      out.println('final Widget Function(BuildContext context) builder;');
       out.println(
-          'const ${service}Page(this.builder, { Key? key }) : super(key: key);');
+          'const ${methodName}Page(this.builder, { Key? key }) : super(key: key);');
 
       out.println('@override');
-      out.println('${service}State createState() => ${service}State();');
+      out.println('State createState() => _${methodName}State();');
     });
 
-    out.addBlock('class ${service}State extends State<${service}Page> {', '}',
+    out.addBlock(
+        'class _${methodName}State extends State<${methodName}Page> {', '}',
         () {
       out.println('@override');
       out.addBlock('Widget build(BuildContext context) {', '}', () {
@@ -343,7 +395,7 @@ ${method._grpcName}State copyWith({
           'Future<${method._responseType}> ${method._dartName}(${method._requestType} ${lowerCaseFirstLetter(method._requestType)}) async {',
           '}', () {
         out.println(
-            'return $_clientClassname.getInstance().${method._dartName}(${lowerCaseFirstLetter(method._requestType)});');
+            'return ${_clientClassname}Wrapper.getInstance().${method._dartName}(${lowerCaseFirstLetter(method._requestType)});');
       });
     });
   }
