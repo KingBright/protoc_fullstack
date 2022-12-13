@@ -176,7 +176,8 @@ class EnumGenerator extends ProtobufContainer {
   }
 
   void generateEnum(IndentingWriter out) {
-    out.addAnnotatedBlock('enum $classname {', '}\n', [
+    var prefix = r'$';
+    out.addAnnotatedBlock('enum $prefix$classname {', '}\n', [
       NamedLocation(
           name: classname!, fieldPathSegment: fieldPath!, start: 'enum '.length)
     ], () {
@@ -191,33 +192,33 @@ class EnumGenerator extends ProtobufContainer {
   }
 
   void generateConverter(IndentingWriter out) {
-    var protoPrefix = r'$proto';
+    var prefix = r'$';
     var paramName = classname!.toLowerCase();
 
     out.addAnnotatedBlock('class ${classname}Converter {', '}', [], () {
       out.addAnnotatedBlock(
-          'static $classname fromProto($protoPrefix.$classname $paramName) {',
-          '}', [], () {
-        out.println(' switch($paramName) {');
-        for (var i = 0; i < _canonicalValues.length; i++) {
-          var val = _canonicalValues[i];
-          final name = dartNames[val.name]!;
-          out.println('   case $protoPrefix.$classname.$name:');
-          out.println('     return $classname.$name;');
-        }
-        out.println(' }');
-        out.println('return null;');
-      });
-
-      out.addAnnotatedBlock(
-          'static $protoPrefix.$classname toProto($classname $paramName) {',
+          'static $prefix$classname fromProto($classname $paramName) {',
           '}', [], () {
         out.println(' switch($paramName) {');
         for (var i = 0; i < _canonicalValues.length; i++) {
           var val = _canonicalValues[i];
           final name = dartNames[val.name]!;
           out.println('   case $classname.$name:');
-          out.println('     return $protoPrefix.$classname.$name;');
+          out.println('     return $prefix$classname.$name;');
+        }
+        out.println(' }');
+        out.println('return null;');
+      });
+
+      out.addAnnotatedBlock(
+          'static $classname toProto($prefix$classname $paramName) {', '}', [],
+          () {
+        out.println(' switch($paramName) {');
+        for (var i = 0; i < _canonicalValues.length; i++) {
+          var val = _canonicalValues[i];
+          final name = dartNames[val.name]!;
+          out.println('   case $prefix$classname.$name:');
+          out.println('     return $classname.$name;');
         }
         out.println(' }');
       });

@@ -362,8 +362,7 @@ class FileGenerator extends ProtobufContainer {
     var out = makeWriter();
 
     writeIsarHeader(out, config);
-    var proto = r'$proto';
-    out.println("import '$fileName.pb.dart' as $proto;");
+    out.println("import '$fileName.pb.dart';");
     out.println();
 
     out.println("part '$fileName.isar.g.dart';");

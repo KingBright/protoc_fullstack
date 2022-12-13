@@ -149,6 +149,10 @@ class ProtobufField {
     return baseType.getDartType(parent.fileGen!);
   }
 
+  String getBaseDartType() {
+    return baseType.getDartType(parent.fileGen!);
+  }
+
   /// Returns the tag number of the underlying proto field.
   int get number => descriptor.number;
 

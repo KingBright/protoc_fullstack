@@ -5,7 +5,7 @@
 
 import 'dart:io';
 
-import 'package:protobuf_isar_plugin/protoc.dart';
+import 'package:protoc_fullstack/protoc.dart';
 
 void main() {
   CodeGenerator(stdin, stdout).generate();

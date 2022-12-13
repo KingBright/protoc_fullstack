@@ -383,7 +383,7 @@ class BlocGenerator extends ProtobufContainer {
   }
 
   void _emitCollectionAnnotation(IndentingWriter out) {
-    out.println('@Collection()');
+    out.println('@collection');
   }
 
   void generateEnums(IndentingWriter out) {

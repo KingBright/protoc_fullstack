@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Fri Aug 26 19:59:49 2022
+
+# Make data base, printed on Tue Dec 13 15:15:57 2022
 
 # Variables
 
@@ -28,7 +31,7 @@ GRADLE_HOME = /Users/jinliang/Library/gradle
 # automatic
 @F = $(notdir $@)
 # makefile
-CURDIR := /Users/jinliang/workspace/WhatToEat/protoc_fullstack
+CURDIR := /Users/jinliang/workspace/protoc_fullstack
 # makefile
 SHELL = /bin/sh
 # environment
@@ -44,7 +47,7 @@ __CFBundleIdentifier = com.microsoft.VSCode
 # environment
 VSCODE_CWD = /
 # environment
-PATH = /Users/jinliang/.cargo/bin:/usr/local/opt/python@3.9/bin:/Users/jinliang/.nvm/versions/node/v17.0.1/bin:/usr/local/bin/:/opt/local/bin:/opt/local/sbin:/Users/jinliang/cocos2d-x/tools/cocos2d-console/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/opt/go/libexec/bin:/Users/jinliang/workspace/go/bin:/Users/jinliang/Library/gradle/bin:/Users/jinliang/Library/Android/sdk/ndk-bundle:/Users/jinliang/Library/Android/sdk:/Users/jinliang/Library/Android/sdk/platform-tools:/Users/jinliang/Library/Android/sdk/tools:/Users/jinliang/bin:/Users/jinliang/Library/Android/sdk/build-tools/26.0.2:/Users/jinliang/workspace/flutter/flutter-sdk/bin:/Users/jinliang/.pub-cache/bin:/Users/jinliang/workspace/flutter/flutter-sdk/.pub-cache/bin:/Users/jinliang/workspace/depot_tools
+PATH = /Library/Frameworks/GStreamer.framework/Commands/:/Users/jinliang/.cargo/bin:/usr/local/opt/python@3.9/bin:/Users/jinliang/.nvm/versions/node/v17.0.1/bin:/usr/local/bin/:/opt/local/bin:/opt/local/sbin:/Users/jinliang/cocos2d-x/tools/cocos2d-console/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/opt/go/libexec/bin:/Users/jinliang/workspace/go/bin:/Users/jinliang/Library/gradle/bin:/Users/jinliang/Library/Android/sdk/tools/bin:/Users/jinliang/Library/Android/sdk/ndk-bundle:/Users/jinliang/Library/Android/sdk:/Users/jinliang/Library/Android/sdk/platform-tools:/Users/jinliang/Library/Android/sdk/tools:/Users/jinliang/Library/Android/sdk/build-tools:/Users/jinliang/bin:/Users/jinliang/Library/Android/sdk/build-tools/33.0.0:/Users/jinliang/workspace/flutter/flutter-sdk/bin:/Users/jinliang/.pub-cache/bin:/Users/jinliang/workspace/flutter/flutter-sdk/.pub-cache/bin:/Users/jinliang/workspace/depot_tools
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
@@ -62,11 +65,13 @@ CMAKE_PREFIX_PATH = /usr/local/Cellar/qt5/5.6.1-1/lib/cmake:
 # environment
 HOMEBREW_GITHUB_API_TOKEN = 3ae4540ad494f117f3396c759fa65c9719a85270
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Qi0rCIRcvW/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.PY13KsCen5/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
-PWD = /Users/jinliang/workspace/WhatToEat/protoc_fullstack
+PWD = /Users/jinliang/workspace/protoc_fullstack
+# environment
+PKG_CONFIG_PATH = /Library/Frameworks/GStreamer.framework/Libraries/pkgconfig/
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
@@ -75,12 +80,10 @@ VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 HOME = /Users/jinliang
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
-# environment
-ANDROID_PRODUCT_OUT = /Users/jinliang/workspace/android/android_source/out/target/product/shamu/
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/jinliang/Library/Application Support/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
+VSCODE_CODE_CACHE_PATH = /Users/jinliang/Library/Application Support/Code/CachedData/5235c6bb189b60b01b1f49062f4ffa42384f8c91
 # environment
 LOGNAME = jinliang
 # environment
@@ -118,7 +121,7 @@ LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # environment
-AAPT_HOME = /Users/jinliang/Library/Android/sdk/build-tools/26.0.2
+AAPT_HOME = /Users/jinliang/Library/Android/sdk/build-tools/33.0.0
 # default
 MAKE_COMMAND := /Applications/Xcode.app/Contents/Developer/usr/bin/make
 # default
@@ -128,7 +131,7 @@ TMPDIR = /var/folders/gh/3p1pf2kj5_5cl235c_424l_w0000gp/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/jinliang/Library/Application Support/Code/1.70.2-main.sock
+VSCODE_IPC_HOOK = /Users/jinliang/Library/Application Support/Code/1.74.0-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -140,7 +143,7 @@ MFLAGS = -Rrqp
 # environment
 NVM_DIR = /Users/jinliang/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.134766127.134766133
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.149400534.149400540
 # environment
 FLUTTER_STORAGE_BASE_URL = https://storage.flutter-io.cn
 # automatic
@@ -172,7 +175,7 @@ LANG = C
 # environment
 USER_BIN = /Users/jinliang/bin
 # environment
-VSCODE_PID = 1507
+VSCODE_PID = 30003
 # variable set hash-table stats:
 # Load=81/1024=8%, Rehash=0, Collisions=3/105=3%
 
@@ -182,9 +185,9 @@ VSCODE_PID = 1507
 
 # Directories
 
-# . (device 16777220, inode 130025134): 16 files, no impossibilities.
+# . (device 16777220, inode 149905842): 14 files, no impossibilities.
 
-# 16 files, no impossibilities in 1 directories.
+# 14 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -210,7 +213,7 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-06 16:18:58
+#  Last modified 2022-12-13 15:15:39
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -220,7 +223,7 @@ proto:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 8):
+#  commands to execute (from `Makefile', line 5):
 	protoc --proto_path test/ test.proto --dart_out=out
 	
 
@@ -230,24 +233,16 @@ proto:
 #  Modification time never checked.
 #  File has not been updated.
 
-test-plugin:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 5):
-	protoc --proto_path test/ test.proto --isar_out=isar:out --plugin=protoc-gen-isar=bin/protoc_plugin_isar.exe
-	
-
 build-plugin:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 2):
-	dart compile exe bin/protoc_plugin_isar.dart
+	dart compile exe bin/protoc_plugin_fs.dart
 	
 
 # files hash-table stats:
-# Load=7/1024=1%, Rehash=0, Collisions=1/19=5%
+# Load=6/1024=1%, Rehash=0, Collisions=1/18=6%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -259,8 +254,6 @@ build-plugin:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Fri Aug 26 19:59:49 2022
+# Finished Make data base on Tue Dec 13 15:15:57 2022
 
  
-make: *** No rule to make target `all'.  Stop.
-

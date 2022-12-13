@@ -3,16 +3,40 @@ syntax = "proto3";
 package dart_test;
 
 message TestMessage {
-    optional string name = 1;
-    int32 code = 2;
-    int64 longCode=3;
+    int32 id=1;
+    optional string name = 2;
+    int32 code = 3;
+    int64 longCode=4;
 
-    TestStruct msg = 4;
-    TestMessage msg1 = 5;
+    TestStruct msg = 5;
+    TestMessage msg1 = 6;
+
+    repeated Test2 tests2=7;
+    repeated Test3 tests3=8;
 }
 
-message TestStruct{
-    string a =1;
-    string b=2;
-    bytes c =3;
+message TestStruct {
+    int32 id=1;
+    string a=2;
+    string b=3;
+    bytes c=4;
+    Options option=5;    
 }
+
+message Test2 {
+    string test=1;
+}
+
+message Test3 {
+    int32 id=1;
+    string test=2;
+}
+
+enum Options {
+    Option1=0;
+    Option2=1;
+}
+
+service Test {
+    rpc test(TestMessage) returns(TestStruct);
+} 

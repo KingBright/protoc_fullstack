@@ -5,6 +5,11 @@
 part of '../protoc.dart';
 
 class FullstackGenerator extends ProtobufContainer {
+  // a map to indicate whether a type presents a collection or not.
+  // If a collection is referenced by another collection, then we weill generate a link.
+  // If the referenced type is just an embedded type, then will do nothing.
+  static final objectType = <String, bool>{};
+
   /// The name of the Dart class to generate.
   @override
   final String classname;
@@ -149,6 +154,7 @@ class FullstackGenerator extends ProtobufContainer {
   // Registers message and enum types that can be used elsewhere.
   void register(GenerationContext ctx) {
     ctx.registerFieldType(this);
+
     for (var m in _fullstackGenerators) {
       m.register(ctx);
     }
@@ -183,6 +189,12 @@ class FullstackGenerator extends ProtobufContainer {
     for (var x in _extensionGenerators) {
       x.resolve(ctx);
     }
+
+    if (_hasId()) {
+      objectType[classname] = true;
+    } else {
+      objectType[classname] = false;
+    }
   }
 
   bool get needsFixnumImport {
@@ -213,14 +225,19 @@ class FullstackGenerator extends ProtobufContainer {
       OneofEnumGenerator.generate(
           out, oneof.oneofEnumName, _oneofFields[oneof.index]);
     }
+
     if (_hasId()) {
-      out.println('@Collection()');
+      out.println('@collection');
+    } else {
+      out.println('@embedded');
     }
-    out.addAnnotatedBlock('class $classname {', '}', [
+
+    var prefix = r'$';
+    out.addAnnotatedBlock('class $prefix$classname {', '}', [
       NamedLocation(
           name: classname, fieldPathSegment: fieldPath, start: 'class '.length)
     ], () {
-      out.printlnAnnotated('$classname() : super();', [
+      out.printlnAnnotated('$prefix$classname() : super();', [
         NamedLocation(name: classname, fieldPathSegment: fieldPath, start: 0)
       ]);
       out.println();
@@ -248,32 +265,58 @@ class FullstackGenerator extends ProtobufContainer {
     return false;
   }
 
+  bool _isCollection(String classname) {
+    if (objectType.containsKey(classname)) {
+      return objectType[classname] ?? false;
+    }
+    return false;
+  }
+
+  bool _isProtoType(String classname) {
+    return objectType.containsKey(classname);
+  }
+
   void generateFactory(IndentingWriter out) {
-    out.print('factory $classname.create(');
+    var prefix = r'$';
+    out.print('factory $prefix$classname.create(');
     if (_fieldList.isNotEmpty) {
       out.println('{');
       for (final field in _fieldList) {
         if (field.isRepeated && !field.isMapField) {
+          var baseType = field.getBaseDartType();
           out.println(
-              '  ${field.baseType.getRepeatedDartTypeIterable(fileGen)}? ${field.memberNames!.fieldName},');
+              '  Iterable<${_isProtoType(baseType) ? prefix : ''}$baseType>? ${field.memberNames!.fieldName},');
         } else {
+          var fieldTypeString = field.getDartType();
+          if (field.baseType.descriptor ==
+              FieldDescriptorProto_Type.TYPE_INT64) {
+            fieldTypeString = 'int';
+          }
           out.println(
-              '  ${field.getDartType()}? ${field.memberNames!.fieldName},');
+              '  ${field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_MESSAGE || field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_ENUM ? prefix : ''}$fieldTypeString? ${field.memberNames!.fieldName},');
         }
       }
       out.print('}');
     }
     if (_fieldList.isNotEmpty) {
       out.println(') {');
-      out.println('  final result = $classname();');
+      out.println('  final result = $prefix$classname();');
       for (final field in _fieldList) {
         out.println('  if (${field.memberNames!.fieldName} != null) {');
-        if (field.isRepeated || field.isMapField) {
+        if (field.isRepeated) {
+          out.println(
+              '    result.${field.memberNames!.fieldName}.addAll(${field.memberNames!.fieldName});');
+        } else if (field.isMapField) {
           out.println(
               '    result.${field.memberNames!.fieldName}.addAll(${field.memberNames!.fieldName});');
         } else {
-          out.println(
-              '    result.${field.memberNames!.fieldName} = ${field.memberNames!.fieldName};');
+          if (_isCollection(field.getDartType())) {
+            out.println(
+                '    result.${field.memberNames!.fieldName}.value = ${field.memberNames!.fieldName};');
+          } else {
+            out.println(
+                '    result.${field.memberNames!.fieldName} = ${field.memberNames!.fieldName};');
+          }
         }
         out.println('  }');
       }
@@ -287,27 +330,38 @@ class FullstackGenerator extends ProtobufContainer {
 
   void generateProtoFactory(IndentingWriter out) {
     if (_fieldList.isNotEmpty) {
-      var prefix = r'$proto';
-      out.print('factory $classname.fromProto($prefix.$classname proto');
+      var prefix = r'$';
+      out.print('factory $prefix$classname.fromProto($classname proto');
       out.println(') {');
-      out.println('  final result = $classname();');
+      out.println('  final result = $prefix$classname();');
       for (final field in _fieldList) {
         //todo: map type not handled
         if (field.isRepeated || field.isMapField) {
           var baseType = field.baseType.getDartType(fileGen);
           out.println(
-              '  result.${field.memberNames!.fieldName}.addAll(proto.${field.memberNames!.fieldName}.map((e) => $baseType.fromProto(e)));');
+              '  result.${field.memberNames!.fieldName}.addAll(proto.${field.memberNames!.fieldName}.map((e) => ${_isProtoType(baseType) ? prefix : ''}$baseType.fromProto(e)));');
         } else if (field.baseType.descriptor ==
             FieldDescriptorProto_Type.TYPE_MESSAGE) {
-          out.println(
-              '  result.${field.memberNames!.fieldName} = ${field.getDartType()}.fromProto(proto.${field.memberNames!.fieldName});');
+          if (_isCollection(field.getDartType())) {
+            out.println(
+                '  result.${field.memberNames!.fieldName}.value = $prefix${field.getDartType()}.fromProto(proto.${field.memberNames!.fieldName});');
+          } else {
+            out.println(
+                '  result.${field.memberNames!.fieldName} = $prefix${field.getDartType()}.fromProto(proto.${field.memberNames!.fieldName});');
+          }
         } else if (field.baseType.descriptor ==
             FieldDescriptorProto_Type.TYPE_ENUM) {
           out.println(
               '  result.${field.memberNames!.fieldName} = ${field.getDartType()}Converter.fromProto(proto.${field.memberNames!.fieldName});');
         } else {
-          out.println(
-              '  result.${field.memberNames!.fieldName} = proto.${field.memberNames!.fieldName};');
+          if (field.baseType.descriptor ==
+              FieldDescriptorProto_Type.TYPE_INT64) {
+            out.println(
+                '  result.${field.memberNames!.fieldName} = proto.${field.memberNames!.fieldName}.toInt();');
+          } else {
+            out.println(
+                '  result.${field.memberNames!.fieldName} = proto.${field.memberNames!.fieldName};');
+          }
         }
       }
       out.println('  return result;');
@@ -318,9 +372,10 @@ class FullstackGenerator extends ProtobufContainer {
 
   void generateToProto(IndentingWriter out) {
     if (_fieldList.isNotEmpty) {
-      var protoPrefix = r'$proto';
-      out.println('$protoPrefix.$classname toProto() {');
-      out.println('  return $protoPrefix.$classname.create()');
+      out.println('$classname toProto() {');
+      out.println('var proto = $classname.create()');
+
+      var defferedFields = <ProtobufField>[];
       for (final field in _fieldList) {
         if (field.descriptor.name == 'id') {
           // ignore id field, id is always specified by the database.
@@ -335,18 +390,40 @@ class FullstackGenerator extends ProtobufContainer {
               '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}');
         } else if (field.baseType.descriptor ==
             FieldDescriptorProto_Type.TYPE_MESSAGE) {
-          out.println(
-              '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}.toProto()');
+          if (_isCollection(field.getDartType())) {
+            defferedFields.add(field);
+          } else {
+            out.println(
+                '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}.toProto()');
+          }
         } else if (field.baseType.descriptor ==
             FieldDescriptorProto_Type.TYPE_ENUM) {
           out.println(
               '  ..${field.memberNames!.fieldName} = ${field.getDartType()}Converter.toProto(${field.memberNames!.fieldName})');
         } else {
-          out.println(
-              '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}');
+          if (field.baseType.descriptor ==
+              FieldDescriptorProto_Type.TYPE_INT64) {
+            out.println(
+                '  ..${field.memberNames!.fieldName} = Int64(${field.memberNames!.fieldName})');
+          } else {
+            out.println(
+                '  ..${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}');
+          }
         }
       }
+
       out.println(';');
+
+      if (defferedFields.isNotEmpty) {
+        for (final field in defferedFields) {
+          out.println('if (${field.memberNames!.fieldName}.value != null) {');
+          out.println(
+              '  proto.${field.memberNames!.fieldName} = ${field.memberNames!.fieldName}.value!.toProto();');
+          out.println('}');
+        }
+      }
+
+      out.println('  return proto;');
       out.println('}');
       out.println();
     }
@@ -358,9 +435,7 @@ class FullstackGenerator extends ProtobufContainer {
     for (var field in _fieldList) {
       out.println();
       if (field.descriptor.name == 'id') {
-        //add id annotation
-        out.println('@Id()');
-        out.println('int? id = Isar.autoIncrement;');
+        out.println('Id? id = Isar.autoIncrement;');
       } else {
         var memberFieldPath = List<int>.from(fieldPath)
           ..addAll([_messageFieldTag, field.sourcePosition!]);
@@ -372,14 +447,41 @@ class FullstackGenerator extends ProtobufContainer {
   void generateField(
       ProtobufField field, IndentingWriter out, List<int> memberFieldPath) {
     var fieldTypeString = field.getDartType();
-    var names = field.memberNames;
 
-    out.printlnAnnotated('late $fieldTypeString ${names!.fieldName};', [
-      NamedLocation(
-          name: names.fieldName,
-          fieldPathSegment: memberFieldPath,
-          start: '$fieldTypeString get '.length)
-    ]);
+    // isar do not support Int64, so just convert Int64 to int
+    if (field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_INT64) {
+      fieldTypeString = 'int';
+    }
+    var names = field.memberNames;
+    var prefix = r'$';
+
+    if (field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_ENUM) {
+      out.println('@enumerated');
+    }
+
+    if (field.isRepeated) {
+      if (_isCollection(field.getBaseDartType())) {
+        out.println(
+            'final ${names!.fieldName} = IsarLinks<$prefix${field.getBaseDartType()}>();');
+      } else {
+        out.println(
+            'final List<$prefix${field.getBaseDartType()}>${names!.fieldName} = [];');
+      }
+    } else if (field.baseType.descriptor ==
+            FieldDescriptorProto_Type.TYPE_MESSAGE &&
+        _isCollection(field.getDartType())) {
+      out.println(
+          'final ${names!.fieldName} = IsarLink<${field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_MESSAGE ? prefix : ''}$fieldTypeString>();');
+    } else {
+      out.printlnAnnotated(
+          'late ${field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_MESSAGE || field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_ENUM ? prefix : ''}$fieldTypeString ${names!.fieldName};',
+          [
+            NamedLocation(
+                name: names.fieldName,
+                fieldPathSegment: memberFieldPath,
+                start: '$fieldTypeString get '.length)
+          ]);
+    }
   }
 
   void generateEnums(IndentingWriter out) {
