@@ -6,8 +6,8 @@ When we come up with an idea and want to make a minimal demo, we will do many wo
 
 ## What in it
 
-* db source code: currently we use isar as the db backend
-* client state management: currently use bloc
+* database related code: currently we use [isar](https://isar.dev/) as the db backend
+* client state management & business logics : currently use [bloc](https://bloclibrary.dev/)
 * client side code: grpc and glue code to data model and state management code
 * server side code: grpc and glue code to db
 
