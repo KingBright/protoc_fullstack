@@ -3,11 +3,13 @@ import 'package:logger/logger.dart';
 
 abstract class BaseClient {
   final Logger logger = Logger();
-  late ClientChannel channel;
-  late CallOptions options;
+  String host;
+  int port;
 
-  BaseClient(String host, int port) {
-    channel = ClientChannel(
+  BaseClient(this.host, this.port);
+
+  ClientChannel clientChannel() {
+    return ClientChannel(
       host,
       port: port,
       options: ChannelOptions(
@@ -16,7 +18,10 @@ abstract class BaseClient {
             CodecRegistry(codecs: const [GzipCodec(), IdentityCodec()]),
       ),
     );
-    options = CallOptions(
+  }
+
+  CallOptions callOptions() {
+    return CallOptions(
         compression: const GzipCodec(), timeout: const Duration(seconds: 5));
   }
 }

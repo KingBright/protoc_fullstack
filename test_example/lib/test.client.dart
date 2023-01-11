@@ -7,25 +7,37 @@
 
 part of 'test.fs.dart';
 
-class TestClientWrapper extends BaseClient {
-  late TestClient _stub;
-  TestClientWrapper(String host, int port) : super(host, port) {
-    _stub = TestClient(channel, options: options);
+class LoginClientWrapper extends BaseClient {
+  late LoginClient _stub;
+  LoginClientWrapper(String host, int port) : super(host, port) {
+    _stub = LoginClient(clientChannel(), options: callOptions());
   }
-  static TestClientWrapper? _instance;
+  static LoginClientWrapper? _instance;
   static init(String host, int port) {
-    _instance = TestClientWrapper(host, port);
+    _instance = LoginClientWrapper(host, port);
   }
 
   static getInstance() {
     return _instance!;
   }
 
-  Future<TestStruct> test(TestMessage testMessage) async {
-    logger.d('test start');
+  Future<Result> login(LoginInfo loginInfo) async {
+    logger.d('login start');
     try {
-      var result = await _stub.test(testMessage);
-      logger.d('test success: $result');
+      var result = await _stub.login(loginInfo);
+      logger.d('login success: $result');
+      return result;
+    } catch (e, trace) {
+      logger.e('error: $e $trace');
+      rethrow;
+    }
+  }
+
+  Future<Result> updateUserProfile(UserProfile userProfile) async {
+    logger.d('updateUserProfile start');
+    try {
+      var result = await _stub.updateUserProfile(userProfile);
+      logger.d('updateUserProfile success: $result');
       return result;
     } catch (e, trace) {
       logger.e('error: $e $trace');

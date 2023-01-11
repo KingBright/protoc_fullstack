@@ -7,106 +7,108 @@
 
 part of 'test.fs.dart';
 
-class testRepository {
-  Future<TestStruct> test(TestMessage testMessage) async {
-    return TestClientWrapper.getInstance().test(testMessage);
+class LoginRepository {
+  Future<Result> login(LoginInfo loginInfo) async {
+    return LoginClientWrapper.getInstance().login(loginInfo);
   }
 }
 
-class testRepositoryProvider extends RepositoryProvider {
-  testRepositoryProvider({super.key, super.child, super.lazy})
-      : super(create: (context) => {testRepository()});
+class LoginRepositoryProvider extends RepositoryProvider {
+  LoginRepositoryProvider({super.key, super.child, super.lazy})
+      : super(create: (context) => {LoginRepository()});
 }
 
-class testState extends Equatable {
-  const testState(this.status, this.testMessage, this.testStruct, this.error);
-  final testStatus status;
-  final TestMessage? testMessage;
-  final TestStruct? testStruct;
+class LoginState extends Equatable {
+  const LoginState(this.status, this.loginInfo, this.result, this.error);
+  final LoginStatus status;
+  final LoginInfo? loginInfo;
+  final Result? result;
   final Error? error;
   @override
-  List<Object?> get props => [status, testMessage, testStruct, error];
-  testState copyWith({
-    testStatus Function()? status,
-    TestMessage Function()? testMessage,
-    TestStruct Function()? testStruct,
+  List<Object?> get props => [status, loginInfo, result, error];
+  LoginState copyWith({
+    LoginStatus Function()? status,
+    LoginInfo Function()? loginInfo,
+    Result Function()? result,
     Error? Function()? error,
   }) {
-    return testState(
+    return LoginState(
       status != null ? status() : this.status,
-      testMessage != null ? testMessage() : this.testMessage,
-      testStruct != null ? testStruct() : this.testStruct,
+      loginInfo != null ? loginInfo() : this.loginInfo,
+      result != null ? result() : this.result,
       error != null ? error() : this.error,
     );
   }
 }
 
-abstract class testEvent extends Equatable {}
+abstract class LoginEvent extends Equatable {}
 
-class testStarted extends testEvent {
-  testStarted(this.testMessage);
-  final TestMessage testMessage;
+class LoginStarted extends LoginEvent {
+  LoginStarted(this.loginInfo);
+  final LoginInfo loginInfo;
   @override
-  List<Object?> get props => [testMessage];
+  List<Object?> get props => [loginInfo];
 }
 
-class testRetry extends testEvent {
-  testRetry(this.testMessage, [this.prevError]);
-  final TestMessage testMessage;
+class LoginRetry extends LoginEvent {
+  LoginRetry(this.loginInfo, [this.prevError]);
+  final LoginInfo loginInfo;
   final BlocError? prevError;
   @override
-  List<Object?> get props => [testMessage, prevError];
+  List<Object?> get props => [loginInfo, prevError];
 }
 
-enum testStatus { initial, loading, success, failure }
+enum LoginStatus { initial, loading, success, failure }
 
-class testBloc extends Bloc<testEvent, testState> {
-  final testRepository repository = testRepository();
-  testBloc({TestMessage? testMessage, TestStruct? testStruct, Error? error})
-      : super(testState(testStatus.initial, testMessage, testStruct, error)) {
-    on<testStarted>(_ontestStart);
-    on<testRetry>(_ontestRetry);
+class LoginBloc extends Bloc<LoginEvent, LoginState> {
+  final BuildContext context;
+  LoginBloc(this.context, {LoginInfo? loginInfo, Result? result, Error? error})
+      : super(LoginState(LoginStatus.initial, loginInfo, result, error)) {
+    on<LoginStarted>(_onLoginStart);
+    on<LoginRetry>(_onLoginRetry);
   }
-  Future<void> _ontestStart(
-    testStarted event,
-    Emitter<testState> emit,
+  LoginRepository repository() {
+    return RepositoryProvider.of<LoginRepository>(context);
+  }
+
+  Future<void> _onLoginStart(
+    LoginStarted event,
+    Emitter<LoginState> emit,
   ) async {
     emit(state.copyWith(
-        status: () => testStatus.loading,
-        testMessage: () => event.testMessage));
-    await emit.forEach<TestStruct>(
-      repository.test(state.testMessage!).asStream(),
-      onData: (testStruct) => state.copyWith(
-          status: () => testStatus.success, testStruct: () => testStruct),
+        status: () => LoginStatus.loading, loginInfo: () => event.loginInfo));
+    await emit.forEach<Result>(
+      repository().login(state.loginInfo!).asStream(),
+      onData: (result) => state.copyWith(
+          status: () => LoginStatus.success, result: () => result),
       onError: (err, stackTrace) => state.copyWith(
-          status: () => testStatus.failure,
+          status: () => LoginStatus.failure,
           error: () => err is Error ? err : Error()),
     );
   }
 
-  Future<void> _ontestRetry(
-    testRetry event,
-    Emitter<testState> emit,
+  Future<void> _onLoginRetry(
+    LoginRetry event,
+    Emitter<LoginState> emit,
   ) async {
     if (event.prevError != null) {
       // todo: do something according the previous error
     }
     emit(state.copyWith(
-        status: () => testStatus.loading,
-        testMessage: () => event.testMessage));
-    await emit.forEach<TestStruct>(
-      repository.test(state.testMessage!).asStream(),
-      onData: (testStruct) => state.copyWith(
-          status: () => testStatus.success, testStruct: () => testStruct),
+        status: () => LoginStatus.loading, loginInfo: () => event.loginInfo));
+    await emit.forEach<Result>(
+      repository().login(state.loginInfo!).asStream(),
+      onData: (result) => state.copyWith(
+          status: () => LoginStatus.success, result: () => result),
       onError: (err, stackTrace) => state.copyWith(
-          status: () => testStatus.failure,
+          status: () => LoginStatus.failure,
           error: () => err is Error ? err : Error()),
     );
   }
 }
 
-class testConsumer extends BlocConsumer<testBloc, testState> {
-  const testConsumer(
+class LoginConsumer extends BlocConsumer<LoginBloc, LoginState> {
+  const LoginConsumer(
       {super.key,
       required super.builder,
       required super.listener,
@@ -114,35 +116,184 @@ class testConsumer extends BlocConsumer<testBloc, testState> {
       super.listenWhen});
 }
 
-class testComponent extends RepositoryProvider {
-  testComponent(
-      {super.key,
-      required BlocWidgetBuilder<testState> builder,
-      required BlocWidgetListener<testState> listener,
-      BlocBuilderCondition<testState>? buildWhen,
-      BlocListenerCondition<testState>? listenWhen,
-      super.lazy})
-      : super(
-            create: (context) => {testRepository()},
-            child: testConsumer(
-              key: key,
-              builder: builder,
-              listener: listener,
-              buildWhen: buildWhen,
-              listenWhen: listenWhen,
-            ));
-}
+class LoginComponent extends StatelessWidget {
+  final BlocWidgetBuilder<LoginState> builder;
+  final BlocWidgetListener<LoginState> listener;
+  final BlocBuilderCondition<LoginState>? buildWhen;
+  final BlocListenerCondition<LoginState>? listenWhen;
 
-class testPage extends StatefulWidget {
-  final Widget Function(BuildContext context) builder;
-  const testPage(this.builder, {Key? key}) : super(key: key);
-  @override
-  State createState() => _testState();
-}
+  LoginComponent({
+    super.key,
+    required this.builder,
+    required this.listener,
+    this.buildWhen,
+    this.listenWhen,
+  });
 
-class _testState extends State<testPage> {
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context);
+    return RepositoryProvider(
+      create: (context) => LoginRepository(),
+      child: BlocProvider(
+        lazy: false,
+        create: (BuildContext context) => LoginBloc(context),
+        child: LoginConsumer(
+          key: key,
+          builder: builder,
+          listener: listener,
+          buildWhen: buildWhen,
+          listenWhen: listenWhen,
+        ),
+      ),
+    );
+  }
+}
+
+class UpdateUserProfileRepository {
+  Future<Result> updateUserProfile(UserProfile userProfile) async {
+    return LoginClientWrapper.getInstance().updateUserProfile(userProfile);
+  }
+}
+
+class UpdateUserProfileRepositoryProvider extends RepositoryProvider {
+  UpdateUserProfileRepositoryProvider({super.key, super.child, super.lazy})
+      : super(create: (context) => {UpdateUserProfileRepository()});
+}
+
+class UpdateUserProfileState extends Equatable {
+  const UpdateUserProfileState(
+      this.status, this.userProfile, this.result, this.error);
+  final UpdateUserProfileStatus status;
+  final UserProfile? userProfile;
+  final Result? result;
+  final Error? error;
+  @override
+  List<Object?> get props => [status, userProfile, result, error];
+  UpdateUserProfileState copyWith({
+    UpdateUserProfileStatus Function()? status,
+    UserProfile Function()? userProfile,
+    Result Function()? result,
+    Error? Function()? error,
+  }) {
+    return UpdateUserProfileState(
+      status != null ? status() : this.status,
+      userProfile != null ? userProfile() : this.userProfile,
+      result != null ? result() : this.result,
+      error != null ? error() : this.error,
+    );
+  }
+}
+
+abstract class UpdateUserProfileEvent extends Equatable {}
+
+class UpdateUserProfileStarted extends UpdateUserProfileEvent {
+  UpdateUserProfileStarted(this.userProfile);
+  final UserProfile userProfile;
+  @override
+  List<Object?> get props => [userProfile];
+}
+
+class UpdateUserProfileRetry extends UpdateUserProfileEvent {
+  UpdateUserProfileRetry(this.userProfile, [this.prevError]);
+  final UserProfile userProfile;
+  final BlocError? prevError;
+  @override
+  List<Object?> get props => [userProfile, prevError];
+}
+
+enum UpdateUserProfileStatus { initial, loading, success, failure }
+
+class UpdateUserProfileBloc
+    extends Bloc<UpdateUserProfileEvent, UpdateUserProfileState> {
+  final BuildContext context;
+  UpdateUserProfileBloc(this.context,
+      {UserProfile? userProfile, Result? result, Error? error})
+      : super(UpdateUserProfileState(
+            UpdateUserProfileStatus.initial, userProfile, result, error)) {
+    on<UpdateUserProfileStarted>(_onUpdateUserProfileStart);
+    on<UpdateUserProfileRetry>(_onUpdateUserProfileRetry);
+  }
+  UpdateUserProfileRepository repository() {
+    return RepositoryProvider.of<UpdateUserProfileRepository>(context);
+  }
+
+  Future<void> _onUpdateUserProfileStart(
+    UpdateUserProfileStarted event,
+    Emitter<UpdateUserProfileState> emit,
+  ) async {
+    emit(state.copyWith(
+        status: () => UpdateUserProfileStatus.loading,
+        userProfile: () => event.userProfile));
+    await emit.forEach<Result>(
+      repository().updateUserProfile(state.userProfile!).asStream(),
+      onData: (result) => state.copyWith(
+          status: () => UpdateUserProfileStatus.success, result: () => result),
+      onError: (err, stackTrace) => state.copyWith(
+          status: () => UpdateUserProfileStatus.failure,
+          error: () => err is Error ? err : Error()),
+    );
+  }
+
+  Future<void> _onUpdateUserProfileRetry(
+    UpdateUserProfileRetry event,
+    Emitter<UpdateUserProfileState> emit,
+  ) async {
+    if (event.prevError != null) {
+      // todo: do something according the previous error
+    }
+    emit(state.copyWith(
+        status: () => UpdateUserProfileStatus.loading,
+        userProfile: () => event.userProfile));
+    await emit.forEach<Result>(
+      repository().updateUserProfile(state.userProfile!).asStream(),
+      onData: (result) => state.copyWith(
+          status: () => UpdateUserProfileStatus.success, result: () => result),
+      onError: (err, stackTrace) => state.copyWith(
+          status: () => UpdateUserProfileStatus.failure,
+          error: () => err is Error ? err : Error()),
+    );
+  }
+}
+
+class UpdateUserProfileConsumer
+    extends BlocConsumer<UpdateUserProfileBloc, UpdateUserProfileState> {
+  const UpdateUserProfileConsumer(
+      {super.key,
+      required super.builder,
+      required super.listener,
+      super.buildWhen,
+      super.listenWhen});
+}
+
+class UpdateUserProfileComponent extends StatelessWidget {
+  final BlocWidgetBuilder<UpdateUserProfileState> builder;
+  final BlocWidgetListener<UpdateUserProfileState> listener;
+  final BlocBuilderCondition<UpdateUserProfileState>? buildWhen;
+  final BlocListenerCondition<UpdateUserProfileState>? listenWhen;
+
+  UpdateUserProfileComponent({
+    super.key,
+    required this.builder,
+    required this.listener,
+    this.buildWhen,
+    this.listenWhen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RepositoryProvider(
+      create: (context) => UpdateUserProfileRepository(),
+      child: BlocProvider(
+        lazy: false,
+        create: (BuildContext context) => UpdateUserProfileBloc(context),
+        child: UpdateUserProfileConsumer(
+          key: key,
+          builder: builder,
+          listener: listener,
+          buildWhen: buildWhen,
+          listenWhen: listenWhen,
+        ),
+      ),
+    );
   }
 }

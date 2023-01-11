@@ -349,6 +349,8 @@ class FileGenerator extends ProtobufContainer {
     out.println("import '$fileName.pbgrpc.dart';");
     out.println("import '$fileName.pbjson.dart';");
 
+    out.println("export 'package:flutter_bloc/flutter_bloc.dart';");
+
     out.println("part '$fileName.bloc.dart';");
     out.println("part '$fileName.client.dart';");
 

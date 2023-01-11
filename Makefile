@@ -7,7 +7,7 @@ proto:
 grpc:
 	protoc -I test test.proto --dart_out=grpc:test_example/lib
 
-all: grpc
+all: grpc proto
 	protoc -I test test.proto --fs_out=fs:test_example/lib --plugin=protoc-gen-fs=bin/protoc_plugin_fs.exe
 	cd test_example && dart run build_runner build --delete-conflicting-outputs
 

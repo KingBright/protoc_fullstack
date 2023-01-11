@@ -106,17 +106,18 @@ class GrpcServiceGenerator {
   }
 
   void generateForClient(String service, IndentingWriter out) {
-    _genWrapper(out);
+    _genClientWrapper(out);
   }
 
-  void _genWrapper(IndentingWriter out) {
+  void _genClientWrapper(IndentingWriter out) {
     out.addBlock('class ${_clientClassname}Wrapper extends BaseClient {', '}',
         () {
       out.println('late $_clientClassname _stub;');
       out.addBlock(
           '${_clientClassname}Wrapper(String host,int port) : super(host, port) {',
           '}', () {
-        out.println('_stub = $_clientClassname(channel, options: options);');
+        out.println(
+            '_stub = $_clientClassname(clientChannel(), options: callOptions());');
       });
 
       out.println('static ${_clientClassname}Wrapper? _instance;');
@@ -139,12 +140,14 @@ class GrpcServiceGenerator {
     out.addBlock(
         '${method._serverStreaming ? 'Stream<${method._responseType}>' : 'Future<${method._responseType}>'} ${lowerCaseFirstLetter(method._grpcName)}(${method._clientStreaming ? 'Stream<${method._requestType}>' : method._requestType} ${lowerCaseFirstLetter(method._requestType)}) ${method._serverStreaming ? '' : 'async'} {',
         '}', () {
-      out.println("logger.d('${method._grpcName} start');");
+      out.println(
+          "logger.d('${lowerCaseFirstLetter(method._grpcName)} start');");
       out.addBlock('try {', '}', () {
         out.println(
             'var result = ${method._serverStreaming ? '' : 'await'} _stub.${lowerCaseFirstLetter(method._grpcName)}(${lowerCaseFirstLetter(method._requestType)});');
         var result = r'$result';
-        out.println("logger.d('${method._grpcName} success: $result');");
+        out.println(
+            "logger.d('${lowerCaseFirstLetter(method._grpcName)} success: $result');");
         out.println('return result;');
       });
 
@@ -185,12 +188,12 @@ class GrpcServiceGenerator {
       _genComponent(out, method);
 
       /// page
-      _genPage(out, method);
+      // _genPage(out, method);
     }
   }
 
   void _genPage(IndentingWriter out, _GrpcMethod method) {
-    String methodName = method._grpcName;
+    String methodName = upCaseFirstLetter(method._grpcName);
     out.addBlock('class ${methodName}Page extends StatefulWidget {', '}', () {
       out.println('final Widget Function(BuildContext context) builder;');
       out.println(
@@ -211,36 +214,51 @@ class GrpcServiceGenerator {
   }
 
   void _genComponent(IndentingWriter out, _GrpcMethod method) {
-    out.addBlock(
-        'class ${method._grpcName}Component extends RepositoryProvider {', '}',
+    var methodName = upCaseFirstLetter(method._grpcName);
+    out.addBlock('class ${methodName}Component extends StatelessWidget {', '}',
         () {
       out.println('''
-${method._grpcName}Component(
+    final BlocWidgetBuilder<${methodName}State> builder;
+    final BlocWidgetListener<${methodName}State> listener;
+    final BlocBuilderCondition<${methodName}State>? buildWhen;
+    final BlocListenerCondition<${methodName}State>? listenWhen;
+
+    ${methodName}Component(
       {super.key,
-      required BlocWidgetBuilder<${method._grpcName}State> builder,
-      required BlocWidgetListener<${method._grpcName}State> listener,
-      BlocBuilderCondition<${method._grpcName}State>? buildWhen,
-      BlocListenerCondition<${method._grpcName}State>? listenWhen,
-      super.lazy})
-      : super(
-            create: (context) => {${method._grpcName}Repository()},
-            child: ${method._grpcName}Consumer(
-              key: key,
-              builder: builder,
-              listener: listener,
-              buildWhen: buildWhen,
-              listenWhen: listenWhen,
-            ));
+      required this.builder,
+      required this.listener,
+      this.buildWhen,
+      this.listenWhen,
+    });
+
+    @override
+    Widget build(BuildContext context) {
+      return RepositoryProvider(
+        create: (context) => ${methodName}Repository(),
+        child: BlocProvider(
+          lazy: false,
+          create: (BuildContext context) => ${methodName}Bloc(context),
+          child: ${methodName}Consumer(
+            key: key,
+            builder: builder,
+            listener: listener,
+            buildWhen: buildWhen,
+            listenWhen: listenWhen,
+          ),
+        ),
+      );
+    }
 ''');
     });
   }
 
   void _genConsumer(IndentingWriter out, _GrpcMethod method) {
+    var methodName = upCaseFirstLetter(method._grpcName);
     out.addBlock(
-        'class ${method._grpcName}Consumer extends BlocConsumer<${method._grpcName}Bloc, ${method._grpcName}State> {',
+        'class ${methodName}Consumer extends BlocConsumer<${methodName}Bloc, ${methodName}State> {',
         '}', () {
       out.println('''
-const ${method._grpcName}Consumer(
+const ${methodName}Consumer(
       {super.key,
       required super.builder,
       required super.listener,
@@ -251,78 +269,83 @@ const ${method._grpcName}Consumer(
   }
 
   void _genBloc(IndentingWriter out, _GrpcMethod method) {
+    var methodName = upCaseFirstLetter(method._grpcName);
     out.addBlock(
-        'class ${method._grpcName}Bloc extends Bloc<${method._grpcName}Event,${method._grpcName}State> {',
+        'class ${methodName}Bloc extends Bloc<${methodName}Event,${methodName}State> {',
         '}', () {
-      out.println(
-          'final ${method._grpcName}Repository repository = ${method._grpcName}Repository();');
+      out.println('final BuildContext context;');
 
       /// constructor
       out.addBlock(
-          '''${method._grpcName}Bloc({${method._requestType}? ${lowerCaseFirstLetter(method._requestType)}, ${method._responseType}? ${lowerCaseFirstLetter(method._responseType)}, Error? error})
-          : super(${method._grpcName}State(${method._grpcName}Status.initial, ${lowerCaseFirstLetter(method._requestType)}, ${lowerCaseFirstLetter(method._responseType)}, error)) {''',
+          '''${methodName}Bloc(this.context, {${method._requestType}? ${lowerCaseFirstLetter(method._requestType)}, ${method._responseType}? ${lowerCaseFirstLetter(method._responseType)}, Error? error})
+          : super(${methodName}State(${methodName}Status.initial, ${lowerCaseFirstLetter(method._requestType)}, ${lowerCaseFirstLetter(method._responseType)}, error)) {''',
           '}', () {
-        out.println(
-            'on<${method._grpcName}Started>(_on${method._grpcName}Start);');
-        out.println(
-            'on<${method._grpcName}Retry>(_on${method._grpcName}Retry);');
+        out.println('on<${methodName}Started>(_on${methodName}Start);');
+        out.println('on<${methodName}Retry>(_on${methodName}Retry);');
         out.println('');
+      });
+
+      /// repository obtain method
+      out.addBlock('${methodName}Repository repository() {', '}', () {
+        out.println(
+            'return RepositoryProvider.of<${methodName}Repository>(context);');
       });
 
       /// on start
       out.addBlock(
-          'Future<void> _on${method._grpcName}Start(${method._grpcName}Started event, Emitter<${method._grpcName}State> emit,) async {',
+          'Future<void> _on${methodName}Start(${methodName}Started event, Emitter<${methodName}State> emit,) async {',
           '}', () {
         out.println(
-            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${lowerCaseFirstLetter(method._requestType)}: () => event.${lowerCaseFirstLetter(method._requestType)}));');
+            'emit(state.copyWith(status: () => ${methodName}Status.loading, ${lowerCaseFirstLetter(method._requestType)}: () => event.${lowerCaseFirstLetter(method._requestType)}));');
 
         out.addBlock('await emit.forEach<${method._responseType}>(', ');', () {
           out.println(
-              'repository.${lowerCaseFirstLetter(method._grpcName)}(state.${lowerCaseFirstLetter(method._requestType)}!).asStream(),');
+              'repository().${lowerCaseFirstLetter(methodName)}(state.${lowerCaseFirstLetter(method._requestType)}!).asStream(),');
           out.println(
-              'onData: (${lowerCaseFirstLetter(method._responseType)}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${lowerCaseFirstLetter(method._responseType)}: () => ${lowerCaseFirstLetter(method._responseType)}),');
+              'onData: (${lowerCaseFirstLetter(method._responseType)}) => state.copyWith(status: () => ${methodName}Status.success, ${lowerCaseFirstLetter(method._responseType)}: () => ${lowerCaseFirstLetter(method._responseType)}),');
           out.println(
-              'onError: (err, stackTrace) => state.copyWith(status: () => ${method._grpcName}Status.failure, error: () => err is Error ? err : Error()),');
+              'onError: (err, stackTrace) => state.copyWith(status: () => ${methodName}Status.failure, error: () => err is Error ? err : Error()),');
         });
       });
 
       /// on retry
       out.addBlock(
-          'Future<void> _on${method._grpcName}Retry(${method._grpcName}Retry event, Emitter<${method._grpcName}State> emit,) async {',
+          'Future<void> _on${methodName}Retry(${methodName}Retry event, Emitter<${methodName}State> emit,) async {',
           '}', () {
         out.addBlock('if (event.prevError != null) {', '}', () {
           out.println('// todo: do something according the previous error');
         });
 
         out.println(
-            'emit(state.copyWith(status: () => ${method._grpcName}Status.loading, ${lowerCaseFirstLetter(method._requestType)}: () => event.${lowerCaseFirstLetter(method._requestType)}));');
+            'emit(state.copyWith(status: () => ${methodName}Status.loading, ${lowerCaseFirstLetter(method._requestType)}: () => event.${lowerCaseFirstLetter(method._requestType)}));');
 
         out.addBlock('await emit.forEach<${method._responseType}>(', ');', () {
           out.println(
-              'repository.${lowerCaseFirstLetter(method._grpcName)}(state.${lowerCaseFirstLetter(method._requestType)}!).asStream(),');
+              'repository().${lowerCaseFirstLetter(methodName)}(state.${lowerCaseFirstLetter(method._requestType)}!).asStream(),');
           out.println(
-              'onData: (${lowerCaseFirstLetter(method._responseType)}) => state.copyWith(status: () => ${method._grpcName}Status.success, ${lowerCaseFirstLetter(method._responseType)}: () => ${lowerCaseFirstLetter(method._responseType)}),');
+              'onData: (${lowerCaseFirstLetter(method._responseType)}) => state.copyWith(status: () => ${methodName}Status.success, ${lowerCaseFirstLetter(method._responseType)}: () => ${lowerCaseFirstLetter(method._responseType)}),');
           out.println(
-              'onError: (err, stackTrace) => state.copyWith(status: () => ${method._grpcName}Status.failure, error: () => err is Error ? err : Error()),');
+              'onError: (err, stackTrace) => state.copyWith(status: () => ${methodName}Status.failure, error: () => err is Error ? err : Error()),');
         });
       });
     });
   }
 
   void _genStatus(IndentingWriter out, _GrpcMethod method) {
+    var methodName = upCaseFirstLetter(method._grpcName);
     out.println(
-        'enum ${method._grpcName}Status { initial, loading, success, failure }');
+        'enum ${methodName}Status { initial, loading, success, failure }');
   }
 
   void _genEvents(IndentingWriter out, _GrpcMethod method) {
-    out.println('abstract class ${method._grpcName}Event extends Equatable {}');
+    var methodName = upCaseFirstLetter(method._grpcName);
+    out.println('abstract class ${methodName}Event extends Equatable {}');
 
     /// start event
-    out.addBlock(
-        'class ${method._grpcName}Started extends ${method._grpcName}Event {',
-        '}', () {
+    out.addBlock('class ${methodName}Started extends ${methodName}Event {', '}',
+        () {
       out.println(
-          '${method._grpcName}Started(this.${lowerCaseFirstLetter(method._requestType)});');
+          '${methodName}Started(this.${lowerCaseFirstLetter(method._requestType)});');
       out.println(
           'final ${method._requestType} ${lowerCaseFirstLetter(method._requestType)};');
       out.println('@override');
@@ -331,11 +354,10 @@ const ${method._grpcName}Consumer(
     });
 
     /// retry event
-    out.addBlock(
-        'class ${method._grpcName}Retry extends ${method._grpcName}Event {',
-        '}', () {
+    out.addBlock('class ${methodName}Retry extends ${methodName}Event {', '}',
+        () {
       out.println(
-          '${method._grpcName}Retry(this.${lowerCaseFirstLetter(method._requestType)}, [this.prevError]);');
+          '${methodName}Retry(this.${lowerCaseFirstLetter(method._requestType)}, [this.prevError]);');
       out.println(
           'final ${method._requestType} ${lowerCaseFirstLetter(method._requestType)};');
       out.println('final BlocError? prevError;');
@@ -346,10 +368,11 @@ const ${method._grpcName}Consumer(
   }
 
   void _genState(IndentingWriter out, _GrpcMethod method) {
-    out.addBlock('class ${method._grpcName}State extends Equatable {', '}', () {
+    var methodName = upCaseFirstLetter(method._grpcName);
+    out.addBlock('class ${methodName}State extends Equatable {', '}', () {
       out.println(
-          'const ${method._grpcName}State(this.status, this.${lowerCaseFirstLetter(method._requestType)}, this.${lowerCaseFirstLetter(method._responseType)}, this.error);');
-      out.println('final ${method._grpcName}Status status;');
+          'const ${methodName}State(this.status, this.${lowerCaseFirstLetter(method._requestType)}, this.${lowerCaseFirstLetter(method._responseType)}, this.error);');
+      out.println('final ${methodName}Status status;');
       out.println(
           'final ${method._requestType}? ${lowerCaseFirstLetter(method._requestType)};');
       out.println(
@@ -361,13 +384,13 @@ const ${method._grpcName}Consumer(
           'List<Object?> get props => [status, ${lowerCaseFirstLetter(method._requestType)}, ${lowerCaseFirstLetter(method._responseType)}, error];');
 
       out.println('''
-${method._grpcName}State copyWith({
-    ${method._grpcName}Status Function()? status,
+${methodName}State copyWith({
+    ${methodName}Status Function()? status,
     ${method._requestType} Function()? ${lowerCaseFirstLetter(method._requestType)},
     ${method._responseType} Function()? ${lowerCaseFirstLetter(method._responseType)},
     Error? Function()? error,
   }) {
-    return ${method._grpcName}State(
+    return ${methodName}State(
       status != null ? status() : this.status,
       ${lowerCaseFirstLetter(method._requestType)} != null ? ${lowerCaseFirstLetter(method._requestType)}() : this.${lowerCaseFirstLetter(method._requestType)},
       ${lowerCaseFirstLetter(method._responseType)} != null ? ${lowerCaseFirstLetter(method._responseType)}() : this.${lowerCaseFirstLetter(method._responseType)},
@@ -379,18 +402,20 @@ ${method._grpcName}State copyWith({
   }
 
   void _genRepoProvider(IndentingWriter out, _GrpcMethod method) {
+    var methodName = upCaseFirstLetter(method._grpcName);
     out.addBlock(
-        'class ${method._grpcName}RepositoryProvider extends RepositoryProvider {',
+        'class ${methodName}RepositoryProvider extends RepositoryProvider {',
         '}', () {
       out.println(
-          '${method._grpcName}RepositoryProvider({super.key, super.child, super.lazy})');
+          '${methodName}RepositoryProvider({super.key, super.child, super.lazy})');
       out.println(
-          '    : super(create: (context) => {${method._grpcName}Repository()});');
+          '    : super(create: (context) => {${methodName}Repository()});');
     });
   }
 
   void _genRepo(IndentingWriter out, _GrpcMethod method) {
-    out.addBlock('class ${method._grpcName}Repository {', '}', () {
+    var methodName = upCaseFirstLetter(method._grpcName);
+    out.addBlock('class ${methodName}Repository {', '}', () {
       out.addBlock(
           'Future<${method._responseType}> ${method._dartName}(${method._requestType} ${lowerCaseFirstLetter(method._requestType)}) async {',
           '}', () {

@@ -16,5 +16,6 @@ import 'test.pb.dart';
 import 'test.pbenum.dart';
 import 'test.pbgrpc.dart';
 import 'test.pbjson.dart';
+export 'package:flutter_bloc/flutter_bloc.dart';
 part 'test.bloc.dart';
 part 'test.client.dart';
