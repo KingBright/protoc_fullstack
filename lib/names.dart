@@ -47,7 +47,7 @@ class FieldNames {
 
   // Identifier for the generated ensureX() method, without braces.
   //
-  // 'null' for scalar, repeated, and map fields.
+  // `null` for scalar, repeated, and map fields.
   final String? ensureMethodName;
 
   FieldNames(this.descriptor, this.index, this.sourcePosition, this.fieldName,
@@ -70,7 +70,7 @@ class OneofNames {
   /// Identifier for the generated enum definition.
   final String oneofEnumName;
 
-  ///  Identifier for the _XByTag map.
+  /// Identifier for the _XByTag map.
   final String byTagMapName;
 
   OneofNames(this.descriptor, this.index, this.clearMethodName,
@@ -117,12 +117,12 @@ Iterable<String> extensionSuffixes() sync* {
   }
 }
 
-/// Replaces all characters in [imput] that are not valid in a dart identifier
+/// Replaces all characters in [input] that are not valid in a dart identifier
 /// with _.
 ///
 /// This function does not take care of leading underscores.
-String legalDartIdentifier(String imput) {
-  return imput.replaceAll(RegExp(r'[^a-zA-Z0-9$_]'), '_');
+String legalDartIdentifier(String input) {
+  return input.replaceAll(RegExp(r'[^a-zA-Z0-9$_]'), '_');
 }
 
 /// Chooses the name of the Dart class holding top-level extensions.
@@ -586,5 +586,5 @@ int countRealOneofs(DescriptorProto descriptor) {
 String lowerCaseFirstLetter(String input) =>
     input[0].toLowerCase() + input.substring(1);
 
-String upCaseFirstLetter(String input) =>
+String upperCaseFirstLetter(String input) =>
     input[0].toUpperCase() + input.substring(1);

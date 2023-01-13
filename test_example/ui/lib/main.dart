@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:test_example/test.fs.dart';
-import 'package:test_example/test.pbgrpc.dart';
+import 'package:test_example/fs/test.fs.dart';
+import 'package:test_example/fs/test.pbgrpc.dart';
 
 void main() {
   LoginClientWrapper.init('127.0.0.1', 1234);

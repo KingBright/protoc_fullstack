@@ -16,6 +16,7 @@ import 'src/options.dart';
 import 'src/output_config.dart';
 import 'src/shared.dart';
 import 'string_escape.dart';
+import 'src/generated/fs/options.pb.dart' as fs;
 
 export 'src/code_generator.dart';
 

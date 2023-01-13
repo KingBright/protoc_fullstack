@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package fs;
+import "fs/options.proto";
+
+message LoginInfo {
+    string email=1 [ (fs.ext) = {name:"email"} ];
+    string password=2;
+}
+
+message Result {
+    int32 code=1;
+    string msg=2;
+ 
+    enum State {
+        A=0;
+        B=1;
+    }
+}
+
+message UserProfile {
+    string name=1;
+    string gender=2;
+    int32 age=3;
+}
+
+service Login {
+    rpc Login(LoginInfo) returns(Result){
+        option (fs.options)= {
+            mode: Both,
+        };
+    };
+    rpc UpdateUserProfile(UserProfile) returns(Result) {
+        option (fs.options)= {
+            mode: Local,
+        };
+    }
+} 

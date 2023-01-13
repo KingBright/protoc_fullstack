@@ -1,14 +1,16 @@
+.PHONY: proto test
+
 plugin:
 	dart compile exe bin/protoc_plugin_fs.dart
 
+options:
+	protoc -I proto --dart_out=grpc:lib/src/generated fs/options.proto
+
 proto:
-	protoc -I test test.proto --dart_out=test_example/lib
+	protoc -I proto --dart_out=grpc:test_example/lib fs/test.proto
 
-grpc:
-	protoc -I test test.proto --dart_out=grpc:test_example/lib
-
-all: grpc proto
-	protoc -I test test.proto --fs_out=fs:test_example/lib --plugin=protoc-gen-fs=bin/protoc_plugin_fs.exe
+all: proto
+	protoc -I proto --fs_out=fs:test_example/lib --plugin=protoc-gen-fs=bin/protoc_plugin_fs.exe fs/test.proto
 	cd test_example && dart run build_runner build --delete-conflicting-outputs
 
 common_deps:

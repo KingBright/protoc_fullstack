@@ -8,11 +8,11 @@ import 'indenting_writer.dart';
 
 /// Finds [name] in the exported mixins.
 PbMixin? findMixin(String name) {
-  const _exportedMixins = {
+  const exportedMixins = {
     'PbMapMixin': _pbMapMixin,
     'PbEventMixin': _pbEventMixin,
   };
-  return _exportedMixins[name];
+  return exportedMixins[name];
 }
 
 /// PbMixin contains metadata needed by dart-protoc-plugin to apply a mixin.
@@ -39,7 +39,7 @@ class PbMixin {
   /// Typically used for static helpers since you cannot mix in static members.
   final List<String>? injectedHelpers;
 
-  /// If `True` the mixin should have static methods for converting to and from
+  /// Whether the mixin should have static methods for converting to and from
   /// proto3 Json.
   final bool hasProto3JsonHelpers;
 

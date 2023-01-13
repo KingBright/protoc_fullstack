@@ -1,1 +1,1 @@
-{"buildTargets":["all","common_deps","create_dart","create_flutter","flutter_deps","grpc","plugin","proto"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
+{"buildTargets":[".PHONY","all","common_deps","create_dart","create_flutter","flutter_deps","plugin","proto","test"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

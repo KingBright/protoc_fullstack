@@ -19,7 +19,7 @@ class ProtobufField {
 
   final FieldDescriptorProto descriptor;
 
-  /// Dart names within a GeneratedMessage or `null` for an extension.
+  /// Dart names within a [GeneratedMessage] or `null` for an extension.
   final FieldNames? memberNames;
 
   final String fullName;
@@ -50,10 +50,13 @@ class ProtobufField {
           ? null
           : "'${descriptor.name}'";
 
-  /// The position of this field as it appeared in the original DescriptorProto.
+  /// The position of this field as it appeared in the original
+  /// DescriptorProto.
+  ///
+  /// `null` for an extension.
   int? get sourcePosition => memberNames?.sourcePosition;
 
-  /// True if the field is to be encoded with [deprecated = true] encoding.
+  /// Whether the field is to be encoded with [deprecated = true] encoding.
   bool get isDeprecated => descriptor.options.deprecated;
 
   bool get isRequired =>
@@ -65,7 +68,7 @@ class ProtobufField {
   /// Whether a numeric field is repeated and must be encoded with packed
   /// encoding.
   ///
-  /// In proto3 repeated fields are encoded as packed by default. The proto2
+  /// In proto3 repeated fields are encoded as packed by default. proto2
   /// requires `[packed=true]` option.
   bool get isPacked {
     if (!isRepeated) {
@@ -109,7 +112,7 @@ class ProtobufField {
   /// True if this field uses the Int64 from the fixnum package.
   bool get needsFixnumImport => baseType.unprefixed == 'Int64';
 
-  /// True if this field is a map field definition:
+  /// Whether this field is a map field definition:
   /// `map<key_type, value_type> map_field = N`.
   bool get isMapField {
     if (!isRepeated || !baseType.isMessage) return false;
@@ -117,8 +120,9 @@ class ProtobufField {
     return generator._descriptor.options.hasMapEntry();
   }
 
-  // `true` if this field should have a `hazzer` generated.
+  /// Whether this field should have a `hazzer` generated.
   bool get hasPresence {
+    // NB. Map fields are represented as repeated message fields
     if (isRepeated) return false;
     return true;
     // TODO(sigurdm): to provide the correct semantics for non-optional proto3
@@ -136,8 +140,6 @@ class ProtobufField {
   }
 
   /// Returns the expression to use for the Dart type.
-  ///
-  /// This will be a List for repeated types.
   String getDartType() {
     if (isMapField) {
       final d = baseType.generator as MessageGenerator;
@@ -166,22 +168,12 @@ class ProtobufField {
     } else if (isRepeated) {
       prefix = 'P';
     }
-    return '$protobufImportPrefix.PbFieldType.' +
-        prefix +
-        baseType.typeConstantSuffix;
+    return '$protobufImportPrefix.PbFieldType.$prefix${baseType.typeConstantSuffix}';
   }
 
   static String _formatArguments(
-      List<String?> positionals, Map<String, String?> named) {
+      List<String> positionals, Map<String, String?> named) {
     final args = positionals.toList();
-    while (args.last == null) {
-      args.removeLast();
-    }
-    for (var i = 0; i < args.length; i++) {
-      if (args[i] == null) {
-        args[i] = 'null';
-      }
-    }
     named.forEach((key, value) {
       if (value != null) {
         args.add('$key: $value');
@@ -192,12 +184,13 @@ class ProtobufField {
 
   /// Returns Dart code adding this field to a BuilderInfo object.
   /// The call will start with ".." and a method name.
-  String generateBuilderInfoCall(String package) {
+  void generateBuilderInfoCall(IndentingWriter out, String package) {
     assert(descriptor.hasJsonName());
-    var quotedName = configurationDependent(
-      'protobuf.omit_field_names',
-      quoted(descriptor.jsonName),
-    );
+
+    final omitFieldNames = ConditionalConstDefinition('omit_field_names');
+    out.addSuffix(
+        omitFieldNames.constFieldName, omitFieldNames.constDefinition);
+    final quotedName = omitFieldNames.createTernary(descriptor.jsonName);
 
     var type = baseType.getDartType(parent.fileGen!);
 
@@ -212,8 +205,13 @@ class ProtobufField {
       final generator = baseType.generator as MessageGenerator;
       var key = generator._fieldList[0];
       var value = generator._fieldList[1];
-      var keyType = key.baseType.getDartType(parent.fileGen!);
-      var valueType = value.baseType.getDartType(parent.fileGen!);
+
+      // Key type is an integer type or string. No need to specify the default
+      // value as the library knows the defaults for integer and string fields.
+      final keyType = key.baseType.getDartType(parent.fileGen!);
+
+      // Value type can be anything other than another map.
+      final valueType = value.baseType.getDartType(parent.fileGen!);
 
       invocation = 'm<$keyType, $valueType>';
 
@@ -222,10 +220,12 @@ class ProtobufField {
       named['valueFieldType'] = value.typeConstant;
       if (value.baseType.isMessage || value.baseType.isGroup) {
         named['valueCreator'] = '$valueType.create';
+        named['valueDefaultOrMaker'] = value.generateDefaultFunction();
       }
       if (value.baseType.isEnum) {
         named['valueOf'] = '$valueType.valueOf';
         named['enumValues'] = '$valueType.values';
+        named['valueDefaultOrMaker'] = value.generateDefaultFunction();
         named['defaultEnumValue'] = value.generateDefaultFunction();
       }
       if (package != '') {
@@ -305,7 +305,9 @@ class ProtobufField {
         }
       }
     }
-    return '..$invocation(${_formatArguments(args, named)})';
+
+    var result = '..$invocation(${_formatArguments(args, named)})';
+    out.println(result);
   }
 
   /// Returns a Dart expression that evaluates to this field's default value.

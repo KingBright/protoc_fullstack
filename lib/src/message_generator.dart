@@ -297,9 +297,12 @@ class MessageGenerator extends ProtobufContainer {
       mixinClause = ' with ${mixinNames.join(", ")}';
     }
 
-    final conditionalPackageName = 'const $protobufImportPrefix.PackageName(' +
-        configurationDependent('protobuf.omit_message_names', quoted(package)) +
-        ')';
+    final omitMessageNames = ConditionalConstDefinition('omit_message_names');
+    out.addSuffix(
+        omitMessageNames.constFieldName, omitMessageNames.constDefinition);
+
+    final conditionalPackageName = 'const $protobufImportPrefix.PackageName'
+        '(${omitMessageNames.createTernary(package)})';
 
     var packageClause =
         package == '' ? '' : ', package: $conditionalPackageName';
@@ -326,11 +329,14 @@ class MessageGenerator extends ProtobufContainer {
           out.println('0 : ${oneof.oneofEnumName}.notSet');
         });
       }
-      final conditionalMessageName = configurationDependent(
-          'protobuf.omit_message_names', quoted(messageName));
+
+      final omitMessageNames = ConditionalConstDefinition('omit_message_names');
+      out.addSuffix(
+          omitMessageNames.constFieldName, omitMessageNames.constDefinition);
+
       out.addBlock(
           'static final $protobufImportPrefix.BuilderInfo _i = '
-              '$protobufImportPrefix.BuilderInfo($conditionalMessageName'
+              '$protobufImportPrefix.BuilderInfo(${omitMessageNames.createTernary(messageName)}'
               '$packageClause'
               ', createEmptyInstance: create'
               '$proto3JsonClause)',
@@ -342,13 +348,13 @@ class MessageGenerator extends ProtobufContainer {
         }
 
         for (var field in _fieldList) {
-          out.println(field.generateBuilderInfoCall(package));
+          field.generateBuilderInfoCall(out, package);
         }
 
         if (_descriptor.extensionRange.isNotEmpty) {
           out.println('..hasExtensions = true');
         }
-        if (!_hasRequiredFields(this, <dynamic>{})) {
+        if (!_hasRequiredFields(this, {})) {
           out.println('..hasRequiredFields = false');
         }
       });
@@ -362,44 +368,7 @@ class MessageGenerator extends ProtobufContainer {
       out.printlnAnnotated('$classname._() : super();', [
         NamedLocation(name: classname, fieldPathSegment: fieldPath, start: 0)
       ]);
-      out.print('factory $classname(');
-      if (_fieldList.isNotEmpty) {
-        out.println('{');
-        for (final field in _fieldList) {
-          _emitDeprecatedIf(field.isDeprecated, out);
-          if (field.isRepeated && !field.isMapField) {
-            out.println(
-                '  ${field.baseType.getRepeatedDartTypeIterable(fileGen)}? ${field.memberNames!.fieldName},');
-          } else {
-            out.println(
-                '  ${field.getDartType()}? ${field.memberNames!.fieldName},');
-          }
-        }
-        out.print('}');
-      }
-      if (_fieldList.isNotEmpty) {
-        out.println(') {');
-        out.println('  final _result = create();');
-        for (final field in _fieldList) {
-          out.println('  if (${field.memberNames!.fieldName} != null) {');
-          if (field.isDeprecated) {
-            out.println(
-                '    // ignore: deprecated_member_use_from_same_package');
-          }
-          if (field.isRepeated || field.isMapField) {
-            out.println(
-                '    _result.${field.memberNames!.fieldName}.addAll(${field.memberNames!.fieldName});');
-          } else {
-            out.println(
-                '    _result.${field.memberNames!.fieldName} = ${field.memberNames!.fieldName};');
-          }
-          out.println('  }');
-        }
-        out.println('  return _result;');
-        out.println('}');
-      } else {
-        out.println(') => create();');
-      }
+      out.println('factory $classname() => create();');
       out.println(
           'factory $classname.fromBuffer($coreImportPrefix.List<$coreImportPrefix.int> i,'
           ' [$protobufImportPrefix.ExtensionRegistry r = $protobufImportPrefix.ExtensionRegistry.EMPTY])'
@@ -407,6 +376,8 @@ class MessageGenerator extends ProtobufContainer {
       out.println('factory $classname.fromJson($coreImportPrefix.String i,'
           ' [$protobufImportPrefix.ExtensionRegistry r = $protobufImportPrefix.ExtensionRegistry.EMPTY])'
           ' => create()..mergeFromJson(i, r);');
+
+      out.println('');
       out.println('''@$coreImportPrefix.Deprecated(
 'Using this can add significant overhead to your binary. '
 'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -419,12 +390,13 @@ class MessageGenerator extends ProtobufContainer {
 'Will be removed in next major version')''');
       out.println('$classname copyWith(void Function($classname) updates) =>'
           ' super.copyWith((message) => updates(message as $classname))'
-          ' as $classname;'
-          ' // ignore: deprecated_member_use');
+          ' as $classname;');
 
+      out.println('');
       out.println('$protobufImportPrefix.BuilderInfo get info_ => _i;');
 
       // Factory functions which can be used as default value closures.
+      out.println('');
       out.println("@$coreImportPrefix.pragma('dart2js:noInline')");
       out.println('static $classname create() => $classname._();');
       out.println('$classname createEmptyInstance() => create();');
@@ -451,7 +423,7 @@ class MessageGenerator extends ProtobufContainer {
   //
   // already_seen is used to avoid checking the same type multiple times
   // (and also to protect against unbounded recursion).
-  bool _hasRequiredFields(MessageGenerator type, Set alreadySeen) {
+  bool _hasRequiredFields(MessageGenerator type, Set<String> alreadySeen) {
     checkResolved();
 
     if (alreadySeen.contains(type.fullName)) {
@@ -689,16 +661,16 @@ class MessageGenerator extends ProtobufContainer {
 
     out.println('@$coreImportPrefix.Deprecated'
         '(\'Use ${toplevelParent!.binaryDescriptorName} instead\')');
-    out.addBlock('const $name = const {', '};', () {
+    out.addBlock('const $name = {', '};', () {
       for (var key in json.keys) {
         out.print("'$key': ");
         if (key == '$nestedTypeTag') {
           // refer to message constants by name instead of repeating each value
-          out.println("const [${nestedTypeNames.join(", ")}],");
+          out.println("[${nestedTypeNames.join(", ")}],");
           continue;
         } else if (key == '$enumTypeTag') {
           // refer to enum constants by name
-          out.println("const [${nestedEnumNames.join(", ")}],");
+          out.println("[${nestedEnumNames.join(", ")}],");
           continue;
         }
         writeJsonConst(out, json[key]);

@@ -8,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This program built for i386-apple-darwin11.3.0
  
 
-# Make data base, printed on Wed Jan 11 11:33:17 2023
+# Make data base, printed on Fri Jan 13 11:20:18 2023
 
 # Variables
 
@@ -175,7 +175,7 @@ LANG = C
 # environment
 USER_BIN = /Users/didi/bin
 # environment
-VSCODE_PID = 37602
+VSCODE_PID = 76301
 # variable set hash-table stats:
 # Load=82/1024=8%, Rehash=0, Collisions=4/108=4%
 
@@ -195,7 +195,7 @@ VSCODE_PID = 37602
 
 # Files
 
-all: grpc proto
+all: proto
 #  Command-line target.
 #  Implicit rule search has not been done.
 #  File does not exist.
@@ -203,16 +203,21 @@ all: grpc proto
 #  Needs to be updated (-q is set).
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/2=0%
-#  commands to execute (from `Makefile', line 11):
+#  commands to execute (from `Makefile', line 16):
 	protoc -I test test.proto --fs_out=fs:test_example/lib --plugin=protoc-gen-fs=bin/protoc_plugin_fs.exe
 	cd test_example && dart run build_runner build --delete-conflicting-outputs
 	
+
+.PHONY: proto test
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 create_dart:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 22):
+#  commands to execute (from `Makefile', line 27):
 	dart create ${project}
 	common_deps
 	
@@ -226,38 +231,21 @@ create_dart:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2023-01-10 14:29:09
+#  Last modified 2023-01-12 22:43:19
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
 proto:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 5):
-	protoc -I test test.proto --dart_out=test_example/lib
-	
-
-create_flutter:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (from `Makefile', line 26):
-	flutter create ${project}
-	flutter_deps
-	common_deps
-	
-
-grpc:
+#  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  Implicit/static pattern stem: `'
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # automatic
-# @ := grpc
+# @ := proto
 # automatic
 # % := 
 # automatic
@@ -274,8 +262,31 @@ grpc:
 # ? := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=1/10=10%
-#  commands to execute (from `Makefile', line 8):
-	protoc -I test test.proto --dart_out=grpc:test_example/lib
+#  commands to execute (from `Makefile', line 7):
+	protoc -I=proto \
+	--dart_out=test_example/lib --dart_opt=paths=source_relative \
+	--dart-grpc_out=test_example/lib --dart-grpc_opt=paths=source_relative \
+	fs/test.proto
+	
+
+test:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 13):
+	protoc -I proto --dart_out=grpc:test_example/lib fs/test.proto
+	
+
+create_flutter:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 31):
+ 
+	flutter create ${project}
+	flutter_deps
+	common_deps
 	
 
 # Not a target:
@@ -288,8 +299,7 @@ plugin:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
-#  commands to execute (from `Makefile', line 2):
+#  commands to execute (from `Makefile', line 4):
 	dart compile exe bin/protoc_plugin_fs.dart
 	
 
@@ -297,7 +307,7 @@ common_deps:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 15):
+#  commands to execute (from `Makefile', line 20):
 	dart pub add grpc isar equatable bloc
 	dart pub add -d isar_generator build_runner
 	
@@ -306,12 +316,12 @@ flutter_deps:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 19):
+#  commands to execute (from `Makefile', line 24):
 	flutter pub add isar_flutter_libs flutter_bloc
 	
 
 # files hash-table stats:
-# Load=11/1024=1%, Rehash=0, Collisions=2/27=7%
+# Load=12/1024=1%, Rehash=0, Collisions=3/29=10%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -323,6 +333,6 @@ flutter_deps:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Jan 11 11:33:17 2023
+# Finished Make data base on Fri Jan 13 11:20:18 2023
 
  

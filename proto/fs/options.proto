@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package fs;
+import "google/protobuf/descriptor.proto";
+
+message MethodOptions {
+    Mode mode=1;
+    CacheMode cacheMode=2;
+
+    enum CacheMode {
+        CacheFirst=0;
+        RemoteFirst=1;
+        Never=2; // default 
+    }
+    enum Mode {
+        Remote=0;
+        Local=1;
+        Both=2; // default
+    }
+}
+
+extend google.protobuf.MethodOptions {
+    optional MethodOptions options=1001;
+}
+
+message FieldExts {
+    string name=1; //display name
+    string desc=2; //description for the field
+    bool required=3; //whether is required 
+    string unit=4; //unit such as mA, m/s etc.
+    repeated string options=5; //set this field if the value should be one of the given options
+    string example=6; //one or more example to show what this field is like
+    string validation=7; //the expression to validate the value
+}
+
+extend google.protobuf.FieldOptions {
+    optional FieldExts ext=1001;
+}

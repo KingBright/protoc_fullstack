@@ -31,9 +31,9 @@ class ServiceGenerator {
 
   static String serviceBaseName(String originalName) {
     if (originalName.endsWith('Service')) {
-      return originalName + 'Base'; // avoid: ServiceServiceBase
+      return '${originalName}Base'; // avoid: ServiceServiceBase
     } else {
-      return originalName + 'ServiceBase';
+      return '${originalName}ServiceBase';
     }
   }
 
@@ -127,7 +127,7 @@ class ServiceGenerator {
       // If it's the same file, we import it without using "as".
       return mg.classname;
     }
-    return mg.fileImportPrefix + '.' + mg.classname;
+    return '${mg.fileImportPrefix}.${mg.classname}';
   }
 
   List<MethodDescriptorProto> get _methodDescriptors => _descriptor.method;
@@ -154,26 +154,26 @@ class ServiceGenerator {
 
   void _generateRequestMethod(IndentingWriter out) {
     out.addBlock(
-        '$_generatedMessage createRequest($coreImportPrefix.String method) {',
+        '$_generatedMessage createRequest($coreImportPrefix.String methodName) {',
         '}', () {
-      out.addBlock('switch (method) {', '}', () {
+      out.addBlock('switch (methodName) {', '}', () {
         for (var m in _methodDescriptors) {
           var inputClass = _getDartClassName(m.inputType);
           out.println("case '${m.name}': return $inputClass();");
         }
         out.println('default: '
-            "throw $coreImportPrefix.ArgumentError('Unknown method: \$method');");
+            "throw $coreImportPrefix.ArgumentError('Unknown method: \$methodName');");
       });
     });
     out.println();
   }
 
-  void _generateDispatchMethod(out) {
+  void _generateDispatchMethod(IndentingWriter out) {
     out.addBlock(
         '$_future<$_generatedMessage> handleCall($_serverContext ctx, '
-            '$coreImportPrefix.String method, $_generatedMessage request) {',
+            '$coreImportPrefix.String methodName, $_generatedMessage request) {',
         '}', () {
-      out.addBlock('switch (method) {', '}', () {
+      out.addBlock('switch (methodName) {', '}', () {
         for (var m in _methodDescriptors) {
           var methodName = _methodName(m.name);
           var inputClass = _getDartClassName(m.inputType);
@@ -181,7 +181,7 @@ class ServiceGenerator {
               '(ctx, request as $inputClass);');
         }
         out.println('default: '
-            "throw $coreImportPrefix.ArgumentError('Unknown method: \$method');");
+            "throw $coreImportPrefix.ArgumentError('Unknown method: \$methodName');");
       });
     });
     out.println();
@@ -232,7 +232,7 @@ class ServiceGenerator {
     out.addBlock(
         'const $coreImportPrefix.Map<$coreImportPrefix.String,'
             ' $coreImportPrefix.Map<$coreImportPrefix.String,'
-            ' $coreImportPrefix.dynamic>> $messageJsonConstant = const {',
+            ' $coreImportPrefix.dynamic>> $messageJsonConstant = {',
         '};', () {
       for (var key in typeConstants.keys) {
         var typeConst = typeConstants[key];

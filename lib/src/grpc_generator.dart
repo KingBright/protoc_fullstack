@@ -44,10 +44,10 @@ class GrpcServiceGenerator {
     }
 
     // avoid: ClientClient
-    _clientClassname = name.endsWith('Client') ? name : name + 'Client';
+    _clientClassname = name.endsWith('Client') ? name : '${name}Client';
     // avoid: ServiceServiceBase
     _serviceClassname =
-        name.endsWith('Service') ? name + 'Base' : name + 'ServiceBase';
+        name.endsWith('Service') ? '${name}Base' : '${name}ServiceBase';
   }
 
   /// Finds all message types used by this service.
@@ -137,6 +137,13 @@ class GrpcServiceGenerator {
   }
 
   void _genMethodWrapper(IndentingWriter out, _GrpcMethod method) {
+    ExtensionRegistry registry = ExtensionRegistry();
+    fs.Options.registerAllExtensions(registry);
+    var reparsedOptions = registry.reparseMessage(method.options);
+    dynamic options = reparsedOptions.getExtension(fs.Options.options);
+
+    out.println('//${options.mode}');
+
     out.addBlock(
         '${method._serverStreaming ? 'Stream<${method._responseType}>' : 'Future<${method._responseType}>'} ${lowerCaseFirstLetter(method._grpcName)}(${method._clientStreaming ? 'Stream<${method._requestType}>' : method._requestType} ${lowerCaseFirstLetter(method._requestType)}) ${method._serverStreaming ? '' : 'async'} {',
         '}', () {
@@ -193,7 +200,7 @@ class GrpcServiceGenerator {
   }
 
   void _genPage(IndentingWriter out, _GrpcMethod method) {
-    String methodName = upCaseFirstLetter(method._grpcName);
+    String methodName = upperCaseFirstLetter(method._grpcName);
     out.addBlock('class ${methodName}Page extends StatefulWidget {', '}', () {
       out.println('final Widget Function(BuildContext context) builder;');
       out.println(
@@ -214,7 +221,7 @@ class GrpcServiceGenerator {
   }
 
   void _genComponent(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.addBlock('class ${methodName}Component extends StatelessWidget {', '}',
         () {
       out.println('''
@@ -253,7 +260,7 @@ class GrpcServiceGenerator {
   }
 
   void _genConsumer(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.addBlock(
         'class ${methodName}Consumer extends BlocConsumer<${methodName}Bloc, ${methodName}State> {',
         '}', () {
@@ -263,13 +270,13 @@ const ${methodName}Consumer(
       required super.builder,
       required super.listener,
       super.buildWhen,
-      super.listenWhen});
+      super.listenWhen}): super();
 ''');
     });
   }
 
   void _genBloc(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.addBlock(
         'class ${methodName}Bloc extends Bloc<${methodName}Event,${methodName}State> {',
         '}', () {
@@ -332,13 +339,13 @@ const ${methodName}Consumer(
   }
 
   void _genStatus(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.println(
         'enum ${methodName}Status { initial, loading, success, failure }');
   }
 
   void _genEvents(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.println('abstract class ${methodName}Event extends Equatable {}');
 
     /// start event
@@ -368,7 +375,7 @@ const ${methodName}Consumer(
   }
 
   void _genState(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.addBlock('class ${methodName}State extends Equatable {', '}', () {
       out.println(
           'const ${methodName}State(this.status, this.${lowerCaseFirstLetter(method._requestType)}, this.${lowerCaseFirstLetter(method._responseType)}, this.error);');
@@ -402,7 +409,7 @@ ${methodName}State copyWith({
   }
 
   void _genRepoProvider(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.addBlock(
         'class ${methodName}RepositoryProvider extends RepositoryProvider {',
         '}', () {
@@ -414,7 +421,7 @@ ${methodName}State copyWith({
   }
 
   void _genRepo(IndentingWriter out, _GrpcMethod method) {
-    var methodName = upCaseFirstLetter(method._grpcName);
+    var methodName = upperCaseFirstLetter(method._grpcName);
     out.addBlock('class ${methodName}Repository {', '}', () {
       out.addBlock(
           'Future<${method._responseType}> ${method._dartName}(${method._requestType} ${lowerCaseFirstLetter(method._requestType)}) async {',
@@ -486,6 +493,8 @@ class _GrpcMethod {
   final String _clientReturnType;
   final String _serverReturnType;
 
+  final MethodOptions options;
+
   _GrpcMethod._(
       this._grpcName,
       this._dartName,
@@ -496,7 +505,8 @@ class _GrpcMethod {
       this._responseType,
       this._argumentType,
       this._clientReturnType,
-      this._serverReturnType);
+      this._serverReturnType,
+      this.options);
 
   factory _GrpcMethod(GrpcServiceGenerator service, GenerationContext ctx,
       MethodDescriptorProto method) {
@@ -530,7 +540,8 @@ class _GrpcMethod {
         responseType,
         argumentType,
         clientReturnType,
-        serverReturnType);
+        serverReturnType,
+        method.options);
   }
 
   void generateClientMethodDescriptor(IndentingWriter out) {

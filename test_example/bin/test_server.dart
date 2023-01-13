@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:grpc/grpc.dart';
-import 'package:test_example/test.pbgrpc.dart';
+import 'package:test_example/fs/test.pbgrpc.dart';
 
 class LoginService extends LoginServiceBase {
   @override
