@@ -182,7 +182,7 @@ packages:
       name: matcher
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.12.18"
+    version: "0.12.12"
   meta:
     dependency: transitive
     description:

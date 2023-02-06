@@ -4,7 +4,7 @@ package fs;
 import "fs/options.proto";
 
 message LoginInfo {
-    string email=1 [ (fs.ext) = {name:"email"} ];
+    string email=1 [(fs.exts) = {name:"email"}];
     string password=2;
 }
 
@@ -25,7 +25,7 @@ message UserProfile {
 }
 
 service Login {
-    rpc Login(LoginInfo) returns(Result){
+    rpc Login(LoginInfo) returns(Result) {
         option (fs.options)= {
             mode: Both,
         };

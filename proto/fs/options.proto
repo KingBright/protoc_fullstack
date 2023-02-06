@@ -8,14 +8,14 @@ message MethodOptions {
     CacheMode cacheMode=2;
 
     enum CacheMode {
-        CacheFirst=0;
-        RemoteFirst=1;
-        Never=2; // default 
+        NoCache=0; // default, never use cache
+        CacheFirst=1; // firstly use cache, at the same time try fetching data from remote
+        RemoteFirst=2; // firstly use remote data, use cache if fail
     }
     enum Mode {
-        Remote=0;
-        Local=1;
-        Both=2; // default
+        Both=0; // default, generate both local bloc and remote bloc 
+        Remote=1; // only remote bloc will be generated
+        Local=2; // only local bloc will be generated
     }
 }
 
@@ -24,15 +24,15 @@ extend google.protobuf.MethodOptions {
 }
 
 message FieldExts {
-    string name=1; //display name
-    string desc=2; //description for the field
-    bool required=3; //whether is required 
-    string unit=4; //unit such as mA, m/s etc.
-    repeated string options=5; //set this field if the value should be one of the given options
-    string example=6; //one or more example to show what this field is like
-    string validation=7; //the expression to validate the value
+    string name=1; // display name
+    string desc=2; // description for the field
+    bool required=3; // whether is required 
+    string unit=4; // unit such as mA, m/s etc.
+    repeated string options=5; // set this field if the value should be one of the given options
+    string example=6; // one or more example to show what this field is like
+    string validation=7; // the expression to validate the value
 }
 
 extend google.protobuf.FieldOptions {
-    optional FieldExts ext=1001;
+    optional FieldExts exts=1001;
 }

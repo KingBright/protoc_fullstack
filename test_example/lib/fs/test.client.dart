@@ -23,7 +23,7 @@ class LoginClientWrapper extends BaseClient {
   static getInstance() {
     return _instance!;
   }
-  //Both
+  //Remote
   Future<Result> login(LoginInfo loginInfo) async {
     logger.d('login start');
     try {
@@ -36,7 +36,7 @@ class LoginClientWrapper extends BaseClient {
       rethrow;
     }
   }
-  //Local
+  //Both
   Future<Result> updateUserProfile(UserProfile userProfile) async {
     logger.d('updateUserProfile start');
     try {

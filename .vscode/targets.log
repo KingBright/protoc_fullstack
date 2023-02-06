@@ -8,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This program built for i386-apple-darwin11.3.0
  
 
-# Make data base, printed on Fri Jan 13 11:20:18 2023
+# Make data base, printed on Mon Feb  6 11:57:10 2023
 
 # Variables
 
@@ -31,7 +31,7 @@ CURDIR := /Users/didi/Workspace/protoc_fullstack
 # makefile
 SHELL = /bin/sh
 # environment
-VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"f45d28db2b892ef5d3a7efebc519f640.zh-cn","_translationsConfigFile":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn/tcf.json","_cacheRoot":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn","_resolvedLanguagePackCoreLocation":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn/97dec172d3256f8ca4bfb2143f3f76b503ca0534","_corruptedFile":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn/corrupted.info","_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"f45d28db2b892ef5d3a7efebc519f640.zh-cn","_translationsConfigFile":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn/tcf.json","_cacheRoot":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn","_resolvedLanguagePackCoreLocation":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn/e2816fe719a4026ffa1ee0189dc89bdfdbafb164","_corruptedFile":"/Users/didi/Library/Application Support/Code/clp/f45d28db2b892ef5d3a7efebc519f640.zh-cn/corrupted.info","_languagePackSupport":true}
 # environment
 _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
@@ -45,6 +45,7 @@ VSCODE_CWD = /
 # environment
 PATH = /Users/didi/.cargo/bin:/usr/local/opt/qt@5/bin:/usr/local/opt/bison/bin:/Users/didi/depot_tools/:/usr/local/sbin:/usr/local/opt/python@3.9/bin:/usr/local/bin/:/opt/local/bin:/opt/local/sbin:/Users/didi/cocos2d-x/tools/cocos2d-console/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/opt/go/libexec/bin:/Users/didi/workspace/go/bin:/Users/didi/Library/gradle/bin:/Users/didi/Library/Android/sdk/ndk-bundle:/Users/didi/Library/Android/sdk:/Users/didi/Library/Android/sdk/platform-tools:/Users/didi/Library/Android/sdk/tools:/Users/didi/bin:/Users/didi/Library/Android/sdk/build-tools/26.0.2:/Users/didi/workspace/flutter/bin:/Users/didi/.pub-cache/bin:/Users/didi/workspace/flutter/flutter-sdk/.pub-cache/bin:/Users/didi/workspace/depot_tools:/usr/local/opt/qt/bin
 # environment
+ 
 GOROOT = /usr/local/opt/go/libexec
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
@@ -65,7 +66,7 @@ CMAKE_PREFIX_PATH = :/usr/local/opt/qt@5:/usr/local/opt/bison/bin
 # environment
 HOMEBREW_GITHUB_API_TOKEN = 3ae4540ad494f117f3396c759fa65c9719a85270
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.lRHSuRQV5T/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.EJZLgrUFrO/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -83,7 +84,7 @@ ANDROID_PRODUCT_OUT = /Users/didi/workspace/android/android_source/out/target/pr
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/didi/Library/Application Support/Code/CachedData/97dec172d3256f8ca4bfb2143f3f76b503ca0534
+VSCODE_CODE_CACHE_PATH = /Users/didi/Library/Application Support/Code/CachedData/e2816fe719a4026ffa1ee0189dc89bdfdbafb164
 # environment
 LOGNAME = didi
 # environment
@@ -131,7 +132,7 @@ TMPDIR = /var/folders/x_/3168s4ns20b697bngj_m0g6w0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/didi/Library/Application Support/Code/1.74.3-main.sock
+VSCODE_IPC_HOOK = /Users/didi/Library/Application Support/Code/1.75.0-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -143,9 +144,11 @@ MFLAGS = -Rrqp
 # environment
 NVM_DIR = /Users/didi/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.68617971.68617977
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.70115963.70115969
 # environment
 FLUTTER_STORAGE_BASE_URL = https://storage.flutter-io.cn
+# environment
+VSCODE_L10N_BUNDLE_LOCATION = 
 # automatic
 +F = $(notdir $+)
 # environment
@@ -175,9 +178,9 @@ LANG = C
 # environment
 USER_BIN = /Users/didi/bin
 # environment
-VSCODE_PID = 76301
+VSCODE_PID = 80725
 # variable set hash-table stats:
-# Load=82/1024=8%, Rehash=0, Collisions=4/108=4%
+# Load=83/1024=8%, Rehash=0, Collisions=4/109=4%
 
 # Pattern-specific Variable Values
 
@@ -185,7 +188,7 @@ VSCODE_PID = 76301
 
 # Directories
 
-# . (device 16777221, inode 68470977): 17 files, no impossibilities.
+# . (device 16777222, inode 68470977): 17 files, no impossibilities.
 
 # 17 files, no impossibilities in 1 directories.
 
@@ -203,8 +206,8 @@ all: proto
 #  Needs to be updated (-q is set).
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/2=0%
-#  commands to execute (from `Makefile', line 16):
-	protoc -I test test.proto --fs_out=fs:test_example/lib --plugin=protoc-gen-fs=bin/protoc_plugin_fs.exe
+#  commands to execute (from `Makefile', line 13):
+	protoc -I proto --fs_out=fs:test_example/lib --plugin=protoc-gen-fs=bin/protoc_plugin_fs.exe fs/test.proto
 	cd test_example && dart run build_runner build --delete-conflicting-outputs
 	
 
@@ -217,7 +220,7 @@ create_dart:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 27):
+#  commands to execute (from `Makefile', line 24):
 	dart create ${project}
 	common_deps
 	
@@ -231,7 +234,7 @@ create_dart:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2023-01-12 22:43:19
+#  Last modified 2023-01-13 23:33:24
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -262,11 +265,8 @@ proto:
 # ? := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=1/10=10%
-#  commands to execute (from `Makefile', line 7):
-	protoc -I=proto \
-	--dart_out=test_example/lib --dart_opt=paths=source_relative \
-	--dart-grpc_out=test_example/lib --dart-grpc_opt=paths=source_relative \
-	fs/test.proto
+#  commands to execute (from `Makefile', line 10):
+	protoc -I proto --dart_out=grpc:test_example/lib fs/test.proto
 	
 
 test:
@@ -274,16 +274,12 @@ test:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 13):
-	protoc -I proto --dart_out=grpc:test_example/lib fs/test.proto
-	
 
 create_flutter:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 31):
- 
+#  commands to execute (from `Makefile', line 28):
 	flutter create ${project}
 	flutter_deps
 	common_deps
@@ -307,7 +303,7 @@ common_deps:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 20):
+#  commands to execute (from `Makefile', line 17):
 	dart pub add grpc isar equatable bloc
 	dart pub add -d isar_generator build_runner
 	
@@ -316,12 +312,20 @@ flutter_deps:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 24):
+#  commands to execute (from `Makefile', line 21):
 	flutter pub add isar_flutter_libs flutter_bloc
 	
 
+options:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 7):
+	protoc -I proto --dart_out=grpc:lib/src/generated fs/options.proto
+	
+
 # files hash-table stats:
-# Load=12/1024=1%, Rehash=0, Collisions=3/29=10%
+# Load=13/1024=1%, Rehash=0, Collisions=3/30=10%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -333,6 +337,6 @@ flutter_deps:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Fri Jan 13 11:20:18 2023
+# Finished Make data base on Mon Feb  6 11:57:10 2023
 
  
