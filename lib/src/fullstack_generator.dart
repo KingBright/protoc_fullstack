@@ -18,6 +18,8 @@ class FullstackGenerator extends ProtobufContainer {
   @override
   final String fullName;
 
+  final ignoreList = [''];
+
   /// The part of the fully qualified name that comes after the package prefix.
   ///
   /// For nested messages this will include the names of the parents.
@@ -228,8 +230,6 @@ class FullstackGenerator extends ProtobufContainer {
 
     if (_hasId()) {
       out.println('@collection');
-    } else {
-      out.println('@embedded');
     }
 
     var prefix = r'$';
@@ -265,6 +265,14 @@ class FullstackGenerator extends ProtobufContainer {
     return false;
   }
 
+  bool _isIgnore(String classname) {
+    return ignoreList.contains(classname);
+  }
+
+  bool _objectExists(String classname) {
+    return objectType.containsKey(classname);
+  }
+
   bool _isCollection(String classname) {
     if (objectType.containsKey(classname)) {
       return objectType[classname] ?? false;
@@ -282,6 +290,10 @@ class FullstackGenerator extends ProtobufContainer {
     if (_fieldList.isNotEmpty) {
       out.println('{');
       for (final field in _fieldList) {
+        if (_isIgnore(field.getDartType())) {
+          continue;
+        }
+
         if (field.isRepeated && !field.isMapField) {
           var baseType = field.getBaseDartType();
           out.println(
@@ -302,6 +314,9 @@ class FullstackGenerator extends ProtobufContainer {
       out.println(') {');
       out.println('  final result = $prefix$classname();');
       for (final field in _fieldList) {
+        if (_isIgnore(field.getDartType())) {
+          continue;
+        }
         out.println('  if (${field.memberNames!.fieldName} != null) {');
         if (field.isRepeated) {
           out.println(
@@ -335,6 +350,9 @@ class FullstackGenerator extends ProtobufContainer {
       out.println(') {');
       out.println('  final result = $prefix$classname();');
       for (final field in _fieldList) {
+        if (_isIgnore(field.getDartType())) {
+          continue;
+        }
         //todo: map type not handled
         if (field.isRepeated || field.isMapField) {
           var baseType = field.baseType.getDartType(fileGen);
@@ -377,6 +395,9 @@ class FullstackGenerator extends ProtobufContainer {
 
       var defferedFields = <ProtobufField>[];
       for (final field in _fieldList) {
+        if (_isIgnore(field.getDartType())) {
+          continue;
+        }
         if (field.descriptor.name == 'id') {
           // ignore id field, id is always specified by the database.
           continue;
@@ -433,6 +454,9 @@ class FullstackGenerator extends ProtobufContainer {
 
   void generateFields(IndentingWriter out) {
     for (var field in _fieldList) {
+      if (_isIgnore(field.getDartType())) {
+        continue;
+      }
       out.println();
       if (field.descriptor.name == 'id') {
         out.println('Id? id = Isar.autoIncrement;');
@@ -464,6 +488,9 @@ class FullstackGenerator extends ProtobufContainer {
         out.println(
             'final ${names!.fieldName} = IsarLinks<$prefix${field.getBaseDartType()}>();');
       } else {
+        if (_objectExists(field.getBaseDartType())) {
+          out.println('@ignore');
+        }
         out.println(
             'final List<$prefix${field.getBaseDartType()}>${names!.fieldName} = [];');
       }
@@ -473,6 +500,9 @@ class FullstackGenerator extends ProtobufContainer {
       out.println(
           'final ${names!.fieldName} = IsarLink<${field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_MESSAGE ? prefix : ''}$fieldTypeString>();');
     } else {
+      if (_objectExists(field.getBaseDartType())) {
+        out.println('@ignore');
+      }
       out.printlnAnnotated(
           'late ${field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_MESSAGE || field.baseType.descriptor == FieldDescriptorProto_Type.TYPE_ENUM ? prefix : ''}$fieldTypeString ${names!.fieldName};',
           [
