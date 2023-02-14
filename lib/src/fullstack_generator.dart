@@ -338,7 +338,7 @@ class FullstackGenerator extends ProtobufContainer {
       out.println('  return result;');
       out.println('}');
     } else {
-      out.println(') => create();');
+      out.println(') => $prefix$classname();');
     }
     out.println();
   }
