@@ -209,7 +209,7 @@ class EnumGenerator extends ProtobufContainer {
           out.println('     return $prefix$classname.$name;');
         }
         out.println(' }');
-        out.println('return null;');
+        out.println('throw UnsupportedTypeError("$prefix$paramName");');
       });
 
       out.addAnnotatedBlock(

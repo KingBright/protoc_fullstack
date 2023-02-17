@@ -4,3 +4,8 @@ class BlocError {
 
   BlocError(this.error, this.stackTrace);
 }
+
+class UnsupportedTypeError extends Error {
+  final String msg;
+  UnsupportedTypeError(this.msg);
+}

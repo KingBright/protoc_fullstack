@@ -4,13 +4,24 @@ version: 1.0.0
 # homepage: https://www.example.com
 
 environment:
-  sdk: '>=2.18.0-271.7.beta <3.0.0'
+  sdk: ">=2.18.0-271.7.beta <3.0.0"
 
 dependencies:
+  flutter:
+    sdk: flutter
   grpc: ^3.0.2
   protobuf: ^2.1.0
+  fixnum: ^1.0.1
+  isar: ^3.0.0
+  isar_flutter_libs: ^3.0.0 # contains the binaries
+  bloc: ^8.1.0
+  flutter_bloc: ^8.1.1
+  equatable: ^2.0.5
   logger: ^1.1.0
 
 dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
   lints: ^2.0.0
   test: ^1.16.0

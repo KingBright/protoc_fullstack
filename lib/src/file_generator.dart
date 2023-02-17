@@ -324,12 +324,8 @@ class FileGenerator extends ProtobufContainer {
     if (!_linked) throw StateError('not linked');
     var out = makeWriter();
     _writeHeading(out);
-    out.println("import 'package:equatable/equatable.dart';");
     out.println("import 'package:fullstack_base/fullstack_base.dart';");
     out.println("import 'package:flutter/widgets.dart';");
-    out.println("import 'package:flutter_bloc/flutter_bloc.dart';");
-    out.println("import 'package:grpc/grpc.dart';");
-    out.println("import 'package:isar/isar.dart';");
 
     out.println();
 
@@ -337,8 +333,6 @@ class FileGenerator extends ProtobufContainer {
     out.println("import '$fileName.pbenum.dart';");
     out.println("import '$fileName.pbgrpc.dart';");
     out.println("import '$fileName.pbjson.dart';");
-
-    out.println("export 'package:flutter_bloc/flutter_bloc.dart';");
 
     out.println("part '$fileName.bloc.dart';");
     out.println("part '$fileName.client.dart';");
@@ -426,7 +420,7 @@ class FileGenerator extends ProtobufContainer {
     out.println();
 
     // add isar
-    out.println("import 'package:isar/isar.dart';");
+    out.println("import 'package:fullstack_base/fullstack_base.dart';");
 
     if (_needsFixnumImport) {
       out.println("import 'package:fixnum/fixnum.dart';");
