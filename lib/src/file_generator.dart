@@ -236,8 +236,9 @@ class FileGenerator extends ProtobufContainer {
   List<CodeGeneratorResponse_File> generateFiles(OutputConfiguration config) {
     if (!_linked) throw StateError('not linked');
 
-    CodeGeneratorResponse_File makeFile(String extension, String content) {
-      var protoUrl = Uri.file(descriptor.name);
+    CodeGeneratorResponse_File makeFile(
+        String extension, String content, String path) {
+      var protoUrl = Uri.file('$path/${descriptor.name}');
       var dartUrl = config.outputPathFor(protoUrl, extension);
       return CodeGeneratorResponse_File()
         ..name = dartUrl.path
@@ -254,14 +255,46 @@ class FileGenerator extends ProtobufContainer {
     // var mainWriter = generateMainFile(config);
     // var enumWriter = generateEnumFile(config);
 
+    // create the two container projects
+    var targetDir = 'generated';
+    // ShellUtil.run('dart create $targetDir/fs_common --force');
+    // ShellUtil.run('dart create $targetDir/fs_server --force');
+    // ShellUtil.run('dart create $targetDir/fs_client --force');
+
+    // // deps for common
+    // ShellUtil.navigate('$targetDir/fs_common');
+    // var result = ShellUtil.run('dart pub add build_runner --dev');
+    // sleep(Duration(seconds: 1));
+    // ShellUtil.run('dart pub add isar_generator --dev');
+    // sleep(Duration(seconds: 1));
+    // ShellUtil.run(
+    //     'dart pub add fullstack_base --path ../../protoc_fullstack/fullstack_base');
+    // sleep(Duration(seconds: 1));
+
+    // deps for client
+
+    // fs_common export
+    writeFile('$targetDir/fs_common/lib/fs_common.dart',
+        generateCommonExportFile(getFileName()));
+    // fs_client export
+    writeFile('$targetDir/fs_client/lib/fs_client.dart',
+        generateClientExportFile(getFileName()));
+    // fs_servert export
+    writeFile('$targetDir/fs_server/lib/fs_server.dart',
+        generateServerExportFile(getFileName()));
+
     final files = [
       // makeFile('.pb.dart', mainWriter.toString()),
       // makeFile('.pbenum.dart', enumWriter.toString()),
       // makeFile('.pbjson.dart', generateJsonFile(config)),
-      makeFile('.fs.dart', generateFullstack(getFileName(), config)),
-      makeFile('.isar.dart', generateIsarFile(getFileName(), config)),
-      makeFile('.bloc.dart', generateBlocFile(getFileName(), config)),
-      makeFile('.client.dart', generateClientFile(getFileName(), config)),
+      makeFile('.isar.dart', generateIsarFile(getFileName(), config),
+          'fs_common/lib'),
+      makeFile('.fs.dart', generateFullstack(getFileName(), config),
+          'fs_client/lib/'),
+      makeFile('.bloc.dart', generateBlocFile(getFileName(), config),
+          'fs_client/lib/'),
+      makeFile('.client.dart', generateClientFile(getFileName(), config),
+          'fs_client/lib/'),
     ];
 
     if (options.generateMetadata) {
@@ -280,6 +313,11 @@ class FileGenerator extends ProtobufContainer {
       // files.add(makeFile('.pbserver.dart', generateServerFile(config)));
     }
     return files;
+  }
+
+  void writeFile(String filepath, String content) {
+    var file = File.fromUri(Uri.file(filepath));
+    file.writeAsStringSync(content);
   }
 
   /// Creates an IndentingWriter with metadata generation enabled or disabled.
@@ -326,13 +364,11 @@ class FileGenerator extends ProtobufContainer {
     _writeHeading(out);
     out.println("import 'package:fullstack_base/fullstack_base.dart';");
     out.println("import 'package:flutter/widgets.dart';");
+    out.println("import 'package:flutter_bloc/flutter_bloc.dart';");
 
     out.println();
 
-    out.println("import '$fileName.pb.dart';");
-    out.println("import '$fileName.pbenum.dart';");
-    out.println("import '$fileName.pbgrpc.dart';");
-    out.println("import '$fileName.pbjson.dart';");
+    out.println("import 'package:fs_common/fs_common.dart';");
 
     out.println("part '$fileName.bloc.dart';");
     out.println("part '$fileName.client.dart';");
@@ -743,6 +779,35 @@ class FileGenerator extends ProtobufContainer {
       Uri target, String ext) {
     var url = config.resolveImport(target, protoFileUri, ext);
     importWriter.addExport(url.toString());
+  }
+
+  String generateCommonExportFile(String moduleName) {
+    var out = makeWriter();
+    out.println("export '$moduleName.isar.dart';");
+    out.println("export '$moduleName.pb.dart';");
+    out.println("export '$moduleName.pbjson.dart';");
+    out.println("export '$moduleName.pbenum.dart';");
+    out.println("export '$moduleName.pbgrpc.dart';");
+    out.println("export 'package:grpc/grpc.dart';");
+    out.println("export 'package:isar/isar.dart';");
+
+    return out.toString();
+  }
+
+  String generateClientExportFile(String moduleName) {
+    var out = makeWriter();
+    out.println("export 'package:flutter_bloc/flutter_bloc.dart';");
+    out.println("export 'package:fs_common/fs_common.dart';");
+    out.println("export '$moduleName.fs.dart';");
+
+    return out.toString();
+  }
+
+  String generateServerExportFile(String moduleName) {
+    var out = makeWriter();
+    out.println("export 'package:fs_common/fs_common.dart';");
+
+    return out.toString();
   }
 }
 

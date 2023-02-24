@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dart_style/dart_style.dart';
+import 'package:logger/logger.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:protoc_fullstack/src/shell_util.dart';
+import 'package:shell/shell.dart';
 
 import 'const_generator.dart' show writeJsonConst;
 import 'indenting_writer.dart';
