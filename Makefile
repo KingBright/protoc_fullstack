@@ -29,3 +29,7 @@ create_flutter:
 	flutter_deps
 	common_deps
 	
+init:
+	dart pub get
+	cd fullstack_base; dart pub get
+	cd fullstack_ui; flutter pub get

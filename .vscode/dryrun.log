@@ -1,5 +1,5 @@
 make --dry-run --always-make --keep-going --print-directory
-make: Entering directory `/Users/didi/Workspace/protoc_fullstack'
+make: Entering directory `/Users/jinliang/Workspace/protoc_fullstack'
 dart compile exe bin/protoc_plugin_fs.dart
-make: Leaving directory `/Users/didi/Workspace/protoc_fullstack'
+make: Leaving directory `/Users/jinliang/Workspace/protoc_fullstack'
  

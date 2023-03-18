@@ -11,7 +11,7 @@ When we come up with an idea and want to make a minimal demo, we will do many wo
 * client side code: grpc and glue code to data model and state management code
 * server side code: grpc and glue code to db
 
-## How to use
+## How to use (deprecated: should update later)
 
 * STEP1 : compile the exe file
 
