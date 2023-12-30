@@ -6,8 +6,9 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
 
-# Make data base, printed on Sat Mar 18 14:47:40 2023
+# Make data base, printed on Sat Dec 30 10:01:01 2023
 
 # Variables
 
@@ -15,8 +16,6 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 <D = $(patsubst %/,%,$(dir $<))
 # automatic
 ?F = $(notdir $?)
-# environment
-ELECTRON_NO_ATTACH_CONSOLE = 1
 # environment
 VSCODE_CRASH_REPORTER_PROCESS_TYPE = extensionHost
 # automatic
@@ -30,7 +29,7 @@ CURDIR := /Users/jinliang/Workspace/protoc_fullstack
 # makefile
 SHELL = /bin/sh
 # environment
-VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"a528b0de79e78fe9f26ab8283e474126.zh-cn","_translationsConfigFile":"/Users/jinliang/Library/Application Support/Code/clp/a528b0de79e78fe9f26ab8283e474126.zh-cn/tcf.json","_cacheRoot":"/Users/jinliang/Library/Application Support/Code/clp/a528b0de79e78fe9f26ab8283e474126.zh-cn","_corruptedFile":"/Users/jinliang/Library/Application Support/Code/clp/a528b0de79e78fe9f26ab8283e474126.zh-cn/corrupted.info","_resolvedLanguagePackCoreLocation":"/Users/jinliang/Library/Application Support/Code/clp/a528b0de79e78fe9f26ab8283e474126.zh-cn/ee2b180d582a7f601fa6ecfdad8d9fd269ab1884","_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"zh-cn","osLocale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"7b3b4bbe44b5870ce6cf5ac70d2b1a12.zh-cn","_translationsConfigFile":"/Users/jinliang/Library/Application Support/Code/clp/7b3b4bbe44b5870ce6cf5ac70d2b1a12.zh-cn/tcf.json","_cacheRoot":"/Users/jinliang/Library/Application Support/Code/clp/7b3b4bbe44b5870ce6cf5ac70d2b1a12.zh-cn","_resolvedLanguagePackCoreLocation":"/Users/jinliang/Library/Application Support/Code/clp/7b3b4bbe44b5870ce6cf5ac70d2b1a12.zh-cn/af28b32d7e553898b2a91af498b1fb666fdebe0c","_corruptedFile":"/Users/jinliang/Library/Application Support/Code/clp/7b3b4bbe44b5870ce6cf5ac70d2b1a12.zh-cn/corrupted.info","_languagePackSupport":true}
 # environment
 _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
@@ -40,19 +39,21 @@ __CFBundleIdentifier = com.microsoft.VSCode
 # environment
 INFOPATH = /opt/homebrew/share/info:
 # environment
-VSCODE_CWD = /Users/jinliang/Workspace/protoc_fullstack
+VSCODE_CWD = /
 # environment
-PATH = /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Users/jinliang/Workspace/flutter/bin:/Users/jinliang/.pub-cache/bin:/Users/jinliang/Library/Android/sdk/platform-tools:/Users/jinliang/bin:/Users/jinliang/goroot
+PATH = /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jinliang/bin:/Users/jinliang/goroot:/Users/jinliang/Library/Android/sdk/platform-tools:/Users/jinliang/Library/Android/sdk/tools:/Users/jinliang/Workspace/flutter/bin:/Users/jinliang/.pub-cache/bin
 # environment
 LSCOLORS = Gxfxcxdxbxegedabagacad
 # environment
 ELECTRON_RUN_AS_NODE = 1
+# environment
+ANDROID_HOME = /Users/jinliang/Library/Android/sdk
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
 LS_COLORS = di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.1UdRLMyarG/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.639Vmt0NNM/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -62,7 +63,7 @@ HOMEBREW_CELLAR = /opt/homebrew/Cellar
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
-MANPATH = /opt/homebrew/share/man::
+MANPATH = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/share/man:/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/usr/share/man:/Applications/Xcode.app/Contents/Developer/usr/share/man:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/share/man:/opt/homebrew/share/man::
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
@@ -70,9 +71,7 @@ HOME = /Users/jinliang
 # default
 MAKEFILEPATH := /Applications/Xcode.app/Contents/Developer/Makefiles
 # environment
-VSCODE_CLI = 1
-# environment
-VSCODE_CODE_CACHE_PATH = /Users/jinliang/Library/Application Support/Code/CachedData/ee2b180d582a7f601fa6ecfdad8d9fd269ab1884
+VSCODE_CODE_CACHE_PATH = /Users/jinliang/Library/Application Support/Code/CachedData/af28b32d7e553898b2a91af498b1fb666fdebe0c
 # environment
 LOGNAME = jinliang
 # environment
@@ -90,9 +89,7 @@ MAKE = $(MAKE_COMMAND)
 # default
 MAKECMDGOALS := all
 # environment
-SHLVL = 3
-# environment
-VSCODE_CRASH_REPORTER_SANDBOXED_HINT = 1
+SHLVL = 1
 # default
 MAKE_VERSION := 3.81
 # environment
@@ -100,15 +97,11 @@ USER = jinliang
 # makefile
 .DEFAULT_GOAL := plugin
 # environment
-TERM_SESSION_ID = F418112D-AD70-4B9F-9B85-EDFA89619035
-# environment
 LESS = -R
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # default
 MAKE_COMMAND := /Applications/Xcode.app/Contents/Developer/usr/bin/make
-# environment
-TERM_PROGRAM = Apple_Terminal
 # default
 .VARIABLES := 
 # environment
@@ -116,7 +109,7 @@ TMPDIR = /var/folders/q_/0bykfl6x79zgp4fkvht8ddmc0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/jinliang/Library/Application Support/Code/1.76-main.sock
+VSCODE_IPC_HOOK = /Users/jinliang/Library/Application Support/Code/1.85-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -126,15 +119,11 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-TERM_PROGRAM_VERSION = 447
-# environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.2612797.2612803.5D15554A-78FB-4DCE-AA45-0459B6E5BDF4
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.46802832.46802838
 # environment
 HOMEBREW_PREFIX = /opt/homebrew
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
-# environment
-VSCODE_L10N_BUNDLE_LOCATION = file:///Users/jinliang/.vscode/extensions/ms-ceintl.vscode-language-pack-zh-hans-1.76.2023030809/translations/extensions/vscode.json-language-features.i18n.json
 # automatic
 +F = $(notdir $+)
 # environment
@@ -155,16 +144,16 @@ LC_ALL = C
 ^F = $(notdir $^)
 # default
 SUFFIXES := 
+# default
+.INCLUDE_DIRS = /usr/local/include
 # environment
 MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-TERM = xterm-256color
-# environment
-VSCODE_PID = 43389
+VSCODE_PID = 90982
 # variable set hash-table stats:
-# Load=76/1024=7%, Rehash=0, Collisions=1/101=1%
+# Load=70/1024=7%, Rehash=0, Collisions=1/96=1%
 
 # Pattern-specific Variable Values
 
@@ -172,9 +161,9 @@ VSCODE_PID = 43389
 
 # Directories
 
-# . (device 16777233, inode 2616507): 17 files, no impossibilities.
+# . (device 16777232, inode 2616507): 18 files, no impossibilities.
 
-# 17 files, no impossibilities in 1 directories.
+# 18 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -218,7 +207,7 @@ create_dart:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2023-03-18 13:06:25
+#  Last modified 2023-03-18 15:09:58
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -240,6 +229,7 @@ proto:
 # automatic
 # + := 
 # automatic
+ 
 # | := 
 # automatic
 # < := 
@@ -292,13 +282,22 @@ common_deps:
 	dart pub add -d isar_generator build_runner
 	
 
- 
 flutter_deps:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 21):
 	flutter pub add isar_flutter_libs flutter_bloc
+	
+
+init:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 33):
+	dart pub get
+	cd fullstack_base; dart pub get
+	cd fullstack_ui; flutter pub get
 	
 
 options:
@@ -310,7 +309,7 @@ options:
 	
 
 # files hash-table stats:
-# Load=13/1024=1%, Rehash=0, Collisions=3/31=10%
+# Load=14/1024=1%, Rehash=0, Collisions=3/32=9%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -322,6 +321,6 @@ options:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sat Mar 18 14:47:40 2023
+# Finished Make data base on Sat Dec 30 10:01:01 2023
 
  
