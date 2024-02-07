@@ -788,8 +788,7 @@ class FileGenerator extends ProtobufContainer {
     out.println("export '$moduleName.pbjson.dart';");
     out.println("export '$moduleName.pbenum.dart';");
     out.println("export '$moduleName.pbgrpc.dart';");
-    out.println("export 'package:grpc/grpc.dart';");
-    out.println("export 'package:isar/isar.dart';");
+    out.println("export 'package:fullstack_base/fullstack_base.dart';");
 
     return out.toString();
   }

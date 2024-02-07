@@ -11,7 +11,7 @@ message LoginInfo {
 message Result {
     int32 code=1;
     string msg=2;
- 
+
     enum State {
         A=0;
         B=1;

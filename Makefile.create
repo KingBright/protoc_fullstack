@@ -15,10 +15,10 @@ rm_unused:
 base: dirs rm_unused deps
 
 grpc:
-	protoc --dart_out=grpc:generated/fs_common/lib -I protos wte.proto
+	protoc --dart_out=grpc:generated/fs_common/lib -I protos ${module}.proto
 
 fs: 
-	protoc --proto_path protos/ wte.proto --fs_out=fs:generated --plugin=protoc-gen-fs=protoc_fullstack/bin/protoc_plugin_fs.exe
+	protoc --proto_path protos/ ${module}.proto --fs_out=fs:generated --plugin=protoc-gen-fs=protoc_fullstack/bin/protoc_plugin_fs.exe
 	
 isar:
 	cd generated/fs_common && flutter pub run build_runner build --delete-conflicting-outputs
