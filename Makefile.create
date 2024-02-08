@@ -24,9 +24,9 @@ isar:
 	cd generated/fs_common && flutter pub run build_runner build --delete-conflicting-outputs
 
 deps:
-	cd generated/fs_common; dart pub add build_runner -d; dart pub add isar_generator -d; dart pub add fullstack_base --path ../../protoc_fullstack/fullstack_base; dart pub get; flutter pub get
-	cd generated/fs_client; dart pub add fs_common --path ../fs_common; dart pub add fullstack_base --path ../../protoc_fullstack/fullstack_base; dart pub add flutter_bloc; dart pub add isar_flutter_libs; dart pub get; flutter pub get
-	cd generated/fs_server; dart pub add fs_common --path ../fs_common; dart pub add fullstack_base --path ../../protoc_fullstack/fullstack_base; dart pub get; flutter pub get
+	cd generated/fs_common; dart pub add build_runner -d; dart pub add isar_generator -d; dart pub add fullstack_base --path ../../protoc_fullstack/fullstack_base; dart pub upgrade; dart pub get; flutter pub get
+	cd generated/fs_client; dart pub add fs_common --path ../fs_common; dart pub add fullstack_base --path ../../protoc_fullstack/fullstack_base; dart pub add flutter_bloc; dart pub add isar_flutter_libs; dart pub upgrade; dart pub get; flutter pub get
+	cd generated/fs_server; dart pub add fs_common --path ../fs_common; dart pub add fullstack_base --path ../../protoc_fullstack/fullstack_base; dart pub upgrade; dart pub get; flutter pub get
 
 plugin:
 	dart compile exe protoc_fullstack/bin/protoc_plugin_fs.dart
